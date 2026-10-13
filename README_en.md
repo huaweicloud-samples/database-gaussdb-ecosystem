@@ -36,8 +36,8 @@ This project aggregates comprehensive information about the GaussDB open-source 
 | Database Tools | ETL | Addx              | 6.0.2            | 505.2.0  | 506.0.0    | [Usage Guide](Addx/README_en.md)                    |
 | Database Tools | ETL | DataX             | 4.0.0            | 505.2.0  | 506.0.0    | [Usage Guide](DataX/README_en.md)                   |
 | Database Tools | ETL | Kettle            | 9.3.0            | 505.2.0  | 506.0.0    | [Usage Guide](Kettle/README_en.md)            |
-| Database Tools | ETL | Flink(JDBC Connector) | 3.3.0            | 505.2.0  | 506.0.0    | [Usage Guide](FlinkConnectorJDBC/3.3.x/README_en.md) |
-| Database Tools | ETL | Flink(JDBC Connector) | 4.0.0            | 505.2.0  | 506.0.0    | [Usage Guide](FlinkConnectorJDBC/4.0.x/README_en.md) |
+| Database Tools | ETL | Flink(JDBC Connector) | 3.3.2            | 505.2.0  | 506.0.0    | [Usage Guide](FlinkConnectorJDBC/3.3.x/README_en.md) |
+| Database Tools | ETL | Flink(JDBC Connector) | 4.0.1            | 505.2.0  | 506.0.0    | [Usage Guide](FlinkConnectorJDBC/4.0.x/README_en.md) |
 | Database Tools | ETL | Flink(CDC Connector)  | 2.4.x            | 507.0.0  | 507.0.0    | [Usage Guide](https://github.com/huaweicloud-samples/database-gaussdb-flink-connector-jdbc/blob/master-dev/flink-connector-gaussdb-cdc-2.4.x/README.md) |
 | Middleware | Distributed Tasks | ElasticJob          | 3.1.0            | 505.2.0  | 506.0.0    | [Usage Guide](Elasticjob/3.1.0/README_en.md)        |
 | AI | Vector Search | LlamaIndex-GaussDB    | 0.1.0            | 505.2.0  |            | [Usage Guide](./LlamaIndex-GaussDB/0.1.0/README_en.md) |

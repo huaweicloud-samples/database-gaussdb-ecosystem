@@ -37,8 +37,8 @@
 | 数据库工具 | ETL | DataX                 | 4.0.0     | 505.2.0  | 506.0.0    | [使用指南](DataX/README.md)                             |
 | 数据库工具 | ETL | Kettle                | 9.3.0     | 505.2.0  | 506.0.0    | [使用指南](Kettle/README.md)                            |
 | 数据库工具 | ETL | Airflow               | 3.0.4    | 505.2.0  | 506.0.0    | [使用指南](Airflow/README.md)                           |
-| 数据库工具 | ETL | Flink(JDBC Connector) | 3.3.0     | 505.2.0  | 506.0.0    | [使用指南](FlinkConnectorJDBC/3.3.x/README.md)          |
-| 数据库工具 | ETL | Flink(JDBC Connector) | 4.0.0     | 505.2.0  | 506.0.0    | [使用指南](FlinkConnectorJDBC/4.0.x/README.md)          |
+| 数据库工具 | ETL | Flink(JDBC Connector) | 3.3.2     | 505.2.0  | 506.0.0    | [使用指南](FlinkConnectorJDBC/3.3.x/README.md)          |
+| 数据库工具 | ETL | Flink(JDBC Connector) | 4.0.1     | 505.2.0  | 506.0.0    | [使用指南](FlinkConnectorJDBC/4.0.x/README.md)          |
 | 数据库工具 | ETL | Flink(CDC Connector)  | 2.4.x     | 507.0.0  | 507.0.0    | [使用指南](https://github.com/huaweicloud-samples/database-gaussdb-flink-connector-jdbc/blob/master-dev/flink-connector-gaussdb-cdc-2.4.x/README.md) |
 | 中间件 | 分布式任务 | DolphinScheduler      | 3.1.4     | 505.2.0  | 506.0.0    | [使用指南](DolphinScheduler/README.md)                  |
 | 中间件 | 分布式任务 | ElasticJob            | 3.1.0     | 505.2.0  | 506.0.0    | [使用指南](Elasticjob/3.1.0/README.md)                  |
