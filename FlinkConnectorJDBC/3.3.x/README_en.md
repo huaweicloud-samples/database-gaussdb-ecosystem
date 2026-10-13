@@ -2,14 +2,15 @@
 
 This document mainly describes the use of[Flink-connector-jdbc-gaussdb](https://github.com/HuaweiCloudDeveloper/gaussdb-flink-connector-jdbc)	. 
 
-This document needs Flink 1.20.x，Flink Connector JDBC 3.3.x. 
+This document applies to Flink 1.20.x. The recommended GaussDB Flink Connector JDBC version is `3.3.2-1.20`.
 
 Related package downloads:
 
 * [**GaussDB Driver-JDK7**](https://repo1.maven.org/maven2/com/huaweicloud/gaussdb/gaussdbjdbc/506.0.0.b058-jdk7/gaussdbjdbc-506.0.0.b058-jdk7.jar)
 * [**GaussDB Driver-JDK17**](https://repo1.maven.org/maven2/com/huaweicloud/gaussdb/gaussdbjdbc/506.0.0.b058/gaussdbjdbc-506.0.0.b058.jar)
-* [**flink-connector-jdbc-gaussdb**](https://repo.maven.apache.org/maven2/com/huaweicloud/gaussdb/flink/flink-connector-jdbc-gaussdb/3.3.0-1.20/)
-* [**flink-connector-jdbc-core**](https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc-core/3.3.0-1.20/)
+* [**flink-connector-jdbc-gaussdb 3.3.2-1.20 (standard Apache Flink)**](https://github.com/huaweicloud-samples/database-gaussdb-flink-connector-jdbc/releases/tag/v3.3.2-1.20-normal)
+* [**flink-connector-jdbc-gaussdb 3.3.2-1.20 (Huawei MRS)**](https://github.com/huaweicloud-samples/database-gaussdb-flink-connector-jdbc/releases/tag/v3.3.2-1.20-mrs)
+* [**flink-connector-jdbc-core 3.3.0-1.20**](https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc-core/3.3.0-1.20/)
 * [**Flink**](https://flink.apache.org/downloads/)
 
 

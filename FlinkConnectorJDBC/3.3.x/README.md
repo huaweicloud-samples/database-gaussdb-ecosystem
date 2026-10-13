@@ -1,14 +1,15 @@
 ‌[Apache Flink ‌](https://flink.apache.org/) 是一个开源的分布式流处理框架，专为大规模数据处理设计，支持流处理和批处理一体化。它能够在无界和有界数据流上进行有状态计算，具有高吞吐量、低延迟的特性，广泛应用于实时数据处理场景。
 本文档主要介绍 [flink-connector-jdbc-gaussdb](https://github.com/HuaweiCloudDeveloper/gaussdb-flink-connector-jdbc) 的使用。
 
-本文档适用于Flink 1.20.x，Flink Connector JDBC 3.3.x版本。
+本文档适用于 Flink 1.20.x，当前推荐使用 GaussDB Flink Connector JDBC `3.3.2-1.20`。
 
 相关依赖jar包下载地址:
 
 * [**GaussDB驱动-JDK7**](https://repo1.maven.org/maven2/com/huaweicloud/gaussdb/gaussdbjdbc/506.0.0.b058-jdk7/gaussdbjdbc-506.0.0.b058-jdk7.jar)
 * [**GaussDB驱动-JDK17**](https://repo1.maven.org/maven2/com/huaweicloud/gaussdb/gaussdbjdbc/506.0.0.b058/gaussdbjdbc-506.0.0.b058.jar)
-* [**flink-connector-jdbc-gaussdb**](https://repo.maven.apache.org/maven2/com/huaweicloud/gaussdb/flink/flink-connector-jdbc-gaussdb/3.3.0-1.20/)
-* [**flink-connector-jdbc-core**](https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc-core/3.3.0-1.20/)
+* [**flink-connector-jdbc-gaussdb 3.3.2-1.20（标准 Apache Flink）**](https://github.com/huaweicloud-samples/database-gaussdb-flink-connector-jdbc/releases/tag/v3.3.2-1.20-normal)
+* [**flink-connector-jdbc-gaussdb 3.3.2-1.20（华为 MRS）**](https://github.com/huaweicloud-samples/database-gaussdb-flink-connector-jdbc/releases/tag/v3.3.2-1.20-mrs)
+* [**flink-connector-jdbc-core 3.3.0-1.20**](https://repo1.maven.org/maven2/org/apache/flink/flink-connector-jdbc-core/3.3.0-1.20/)
 * [**Flink**](https://flink.apache.org/downloads/)
 
 ## 使用说明
