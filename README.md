@@ -32,6 +32,7 @@
 | 开发框架 | 连接池   | Druid                 | 1.2.23    | 505.2.0  | 506.0.0    | [使用指南](./Druid/1.2.x/README.md)                     |
 | 开发框架 | 定时任务 | Quartz                | 2.5.0     | 505.2.0  |    506.0.0  | [使用指南](./Quartz/2.5.0/README.md)                    |
 | 开发框架 | 系统集成 | Apache Camel          | 4.13.0    |505.2.0|506.0.0| [使用指南](Camel/4.13.x/README.md)                      |
+| 数据库工具 | 客户端 | DBeaver（GaussDB 增强版） | 26.1.5 | 505.2.1.SPC0800 | 按目标数据库版本匹配 | [使用指南](./DBeaver/26.1.x/README.md) |
 | 数据库工具 | 客户端 | DBeaver               |           | 505.2.0  | 506.0.0    | [使用指南](./DBeaver/25.0.x/README.md)                  |
 | 数据库工具 | ETL | Addx                  | 6.0.2     | 505.2.0  | 506.0.0    | [使用指南](Addx/README.md)                              |
 | 数据库工具 | ETL | DataX                 | 4.0.0     | 505.2.0  | 506.0.0    | [使用指南](DataX/README.md)                             |

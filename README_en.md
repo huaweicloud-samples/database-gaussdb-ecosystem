@@ -32,6 +32,7 @@ This project aggregates comprehensive information about the GaussDB open-source 
 | Development Frameworks | Connection Pools   | Druid                | 1.2.23           | 505.2.0  | 506.0.0    | [Usage Guide](./Druid/1.2.x/README_en.md)           |
 | Development Frameworks | Scheduled Jobs | Quartz            | 2.5.0            | 505.2.0  |    506.0.0  | [Usage Guide](./Quartz/2.5.0/README_en.md)          |
 | Development Frameworks | Integration | Apache Camel| 4.13.0           |505.2.0|506.0.0| [Usage Guide](Camel/4.13.x/README_en.md)            |
+| Database Tools | Clients | DBeaver (GaussDB Enhanced) | 26.1.5 | 505.2.1.SPC0800 | Match the target database version | [Usage Guide](./DBeaver/26.1.x/README_en.md) |
 | Database Tools | Clients | DBeaver              |                  | 505.2.0  | 506.0.0    | [Usage Guide](./DBeaver/25.0.x/README_en.md)        |
 | Database Tools | ETL | Addx              | 6.0.2            | 505.2.0  | 506.0.0    | [Usage Guide](Addx/README_en.md)                    |
 | Database Tools | ETL | DataX             | 4.0.0            | 505.2.0  | 506.0.0    | [Usage Guide](DataX/README_en.md)                   |
