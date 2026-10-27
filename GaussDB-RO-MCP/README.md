@@ -1,7 +1,7 @@
 # GaussDB 只读 MCP 服务器（gaussdb-ro-mcp）集成指南
 
-> 适用版本：gaussdb-ro-mcp v0.2.4；GaussDB Kernel 503.1.0 及以上（集中式 / 分布式）、openGauss 6.0.0
-> 更新日期：2026-09-29
+> 适用版本：gaussdb-ro-mcp v0.3.0；GaussDB Kernel 503.1.0 及以上（集中式 / 分布式）、openGauss 6.0.0
+> 更新日期：2026-10-27
 > 项目地址：<https://github.com/gxc/gaussdb-ro-mcp>
 
 ## 1. 概述
@@ -25,7 +25,7 @@ Claude Code / OpenCode ──MCP(stdio)──> gaussdb-ro-mcp ──官方驱动
 |---|---|
 | GaussDB | 集中式 / 主备 / 分布式均可；Kernel 503.1.0 及以上 |
 | 账号 | 建议使用仅授予 SELECT 权限的只读账号（见第 5 节第 3 层） |
-| 运行环境 | Linux amd64 / arm64、macOS（Apple Silicon）、Windows amd64（静态链接，无运行时依赖）；或 Go 1.26+ 自行构建 |
+| 运行环境 | Linux amd64 / arm64、macOS（Apple Silicon）、Windows amd64（静态链接，无运行时依赖）；或 Go 1.26.10+ 自行构建 |
 | MCP 客户端 | Claude Code、OpenCode 或任意支持 stdio MCP 的工具 |
 
 ## 3. 快速开始
@@ -77,7 +77,7 @@ instances:
 default_instance: prod
 ```
 
-支持一个文件配置多个实例（`dsn` 或拆分字段形式均可），工具调用时以 `instance` 参数选择。
+支持一个文件配置多个实例（`dsn` 或拆分字段形式均可），工具调用时以 `instance` 参数选择。v0.3.0 起全部实例名（含默认实例标注）会写入 `instance` 参数的 schema 描述，Agent 在获取工具列表阶段即可发现可选实例，无需试错；各工具的描述中也内置了使用指引（如先 `test_connection` 验证连通、`describe_table` 查看结构后再 `execute_select` 抽样）。
 
 ### 3.3 接入 Claude Code
 
@@ -172,4 +172,5 @@ gaussdb-ro-mcp v0.2.0 起统一采用上述**事务级**方案，在集中式 / 
 * 问题反馈：<https://github.com/gxc/gaussdb-ro-mcp/issues>
 * MCP 官方 Registry 收录：`io.github.gxc/gaussdb-ro-mcp`（<https://registry.modelcontextprotocol.io>）
 * 持续集成：GitHub Actions 自动执行 `go vet`、`go test -race`、四平台交叉编译与 govulncheck 安全扫描（[CI 状态](https://github.com/gxc/gaussdb-ro-mcp/actions/workflows/ci.yml)）
+* 安全策略与漏洞上报流程：[SECURITY.md](https://github.com/gxc/gaussdb-ro-mcp/blob/main/SECURITY.md)（v0.3.0 已修复 x/text GO-2026-5970、net/http GO-2026-6617、crypto/x509 GO-2026-6809）
 * 驱动：gaussdb-go v1.0.0-rc1（<https://github.com/HuaweiCloudDeveloper/gaussdb-go>）

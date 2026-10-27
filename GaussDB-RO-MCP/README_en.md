@@ -1,7 +1,7 @@
 # GaussDB Read-Only MCP Server (gaussdb-ro-mcp) Integration Guide
 
-> Applicable versions: gaussdb-ro-mcp v0.2.4; GaussDB Kernel 503.1.0 and above (centralized / distributed), openGauss 6.0.0
-> Updated: 2026-09-29
+> Applicable versions: gaussdb-ro-mcp v0.3.0; GaussDB Kernel 503.1.0 and above (centralized / distributed), openGauss 6.0.0
+> Updated: 2026-10-27
 > Project: <https://github.com/gxc/gaussdb-ro-mcp>
 
 ## 1. Overview
@@ -25,7 +25,7 @@ The biggest risk of connecting a database to an AI agent is **prompt injection**
 |---|---|
 | GaussDB | Centralized / primary-standby / distributed; Kernel 503.1.0 and above |
 | Account | A read-only account with only SELECT privileges is recommended (layer 3 in Section 5) |
-| Runtime | Linux amd64 / arm64, macOS (Apple Silicon), Windows amd64 (statically linked, no runtime dependencies); or build from source with Go 1.26+ |
+| Runtime | Linux amd64 / arm64, macOS (Apple Silicon), Windows amd64 (statically linked, no runtime dependencies); or build from source with Go 1.26.10+ |
 | MCP client | Claude Code, OpenCode, or any stdio-capable MCP client |
 
 ## 3. Quick Start
@@ -77,7 +77,7 @@ instances:
 default_instance: prod
 ```
 
-Multiple instances are supported in a single file (either `dsn` or split fields); tools select one via the `instance` parameter.
+Multiple instances are supported in a single file (either `dsn` or split fields); tools select one via the `instance` parameter. Since v0.3.0, all instance names (with the default one annotated) are written into the `instance` parameter's schema description, so the agent can discover available instances when listing tools — no trial and error needed. Tool descriptions also embed usage guidance (e.g. run `test_connection` first to verify connectivity, then `describe_table` before sampling with `execute_select`).
 
 ### 3.3 Hook it up to Claude Code
 
@@ -172,4 +172,5 @@ Customize `server.blocked_functions` (note: a non-empty list replaces the defaul
 * Issue tracker: <https://github.com/gxc/gaussdb-ro-mcp/issues>
 * Listed on the official MCP Registry: `io.github.gxc/gaussdb-ro-mcp` (<https://registry.modelcontextprotocol.io>)
 * Continuous integration: GitHub Actions runs `go vet`, `go test -race`, four-platform cross-compilation, and govulncheck security scanning ([CI status](https://github.com/gxc/gaussdb-ro-mcp/actions/workflows/ci.yml))
+* Security policy and vulnerability reporting: [SECURITY.md](https://github.com/gxc/gaussdb-ro-mcp/blob/main/SECURITY.md) (v0.3.0 fixed x/text GO-2026-5970, net/http GO-2026-6617, crypto/x509 GO-2026-6809)
 * Driver: gaussdb-go v1.0.0-rc1 (<https://github.com/HuaweiCloudDeveloper/gaussdb-go>)
