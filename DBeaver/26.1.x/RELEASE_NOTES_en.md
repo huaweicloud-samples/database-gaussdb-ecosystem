@@ -1,5 +1,7 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Release Notes
 
+Build: `26.1.5.202611021100`; updated on 2026-11-02. The original release tag is retained; the archive, product manifest and checksums are replaced with this build.
+
 Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014`
 
 ## Assets
@@ -8,8 +10,8 @@ This release contains only the Kylin V10 x86_64 edition:
 
 | File | Purpose | SHA-256 |
 | --- | --- | --- |
-| `DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz` | Client archive | `9ce40956dde52360ca3928f600b2d3fd5add036c174c6c9261105a932bfe1484` |
-| `DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.PRODUCT-MANIFEST.json` | Package file manifest | `2d4fc028cf9e660509304bebaedbf9021e95ab00d5f185c2d6c8f75db1916a13` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz` | Client archive | `bea7cc5bdb9fea0f1f54a5fdf54ba8d2bd71d825168c38d6462917fcdf845d2e` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json` | Package file manifest | `758b06a5effeebbaea9df4a3a6a659821ce9fbd013d8240eb099f1a88a540359` |
 | `SHA256SUMS` | Checksum entry point for the two payload files above | Generated and read back during publication |
 
 ## Highlights
@@ -21,14 +23,14 @@ This release contains only the Kylin V10 x86_64 edition:
 - Package specification, body, and full compilation, error navigation, and batch deletion.
 - Simplified Chinese resources and complete operation screenshots.
 
-## Validation summary
+## Repairs and validation in this build
 
-- Product build 204/204 and packaging tests 43/43 passed.
-- Main project regression: 2,867 total, 2,683 passed, 184 conditionally skipped, 0 failed, and 0 errors.
-- Independent acceptance gate: 337/337 passed.
-- GaussDB 505 distributed live-database acceptance passed.
-- GaussDB 505 centralized live-database acceptance passed 12/12.
-- The final Kylin V10 x86_64 archive passed a clean-workspace, Simplified Chinese UI, and GaussDB debug plug-in cold-start check.
+- Fix JDBC driver concurrency failures during parallel multi-schema metadata loading.
+- Fix M-mode SESSION_USER connection initialization errors.
+- Include the debug parameter panel layoutData null-pointer repair and guidance for stale routine OIDs.
+- All 204 product modules built; main regression: 2,693 passed, 184 skipped, zero failures or errors.
+- Two drivers each passed three multi-schema refresh rounds of 500 tasks; M-mode data reading and parameter panel creation passed.
+- This run used a translated Kylin V10 x86_64 container and centralized 507 server, including the 505 JDBC driver. The full historical 505 server suite was not rerun. See the usage guide for validation boundaries.
 
 ## Boundaries
 
