@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.20261102r3`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.20261102r4`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
 
 ## 1. Overview
 
@@ -18,8 +18,8 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102-r3)
-- Source revision: `ecf40f372a1ef432d75078b51f6d5cda5c68267e`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102-r4)
+- Source revision: `1218bef04bb343595f1250b285289450772800a1`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -40,21 +40,21 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r3)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r3.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r3/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r3.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r3/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r3.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r3/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/SHA256SUMS)
 
 SHA-256:
 
 ```text
-56a1fc08de50d2e8151c3238c233b664259eec3b4095742220bd12432f7ae71c  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r3.tar.gz
+ddeeb034de4024ae2ac7cee078bb16a9d9c996329d488eedf9cdc74a8f660773  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r3.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
 uname -m
 ```
 
@@ -65,7 +65,7 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r3.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -109,9 +109,11 @@ Built-in GaussDB drivers disable “Thread safe driver” by default, serializin
 1. In **Database Navigator**, expand the database, schema, and **Procedures** or **Functions** node.
 2. Open the routine and save its source.
 3. Double-click the editor ruler beside an executable line to add a breakpoint.
-4. Right-click the routine and choose **Debug As** > **GaussDB routine**, or create a GaussDB entry in **Debug Configurations**.
+4. Open **Database** > **Database Debug...**, or the debug (bug) toolbar drop-down > **Database Debug Configurations...**, then create a database debug configuration. **Debug As** on a specific routine is another entry point.
 5. Select the data source and routine, then provide values for all `IN` and `INOUT` parameters.
 6. Choose **Debug**.
+
+The generic **Run** > **Run Configurations...** menu remains available for other launch types; the database debug type is offered only in **Debug Configurations**. Execute ordinary SQL in the SQL editor. If an older build reports `No tab group defined` when creating an entry in **Run Configurations**, close that dialog, use the database debug entry above, and update to this build. Do not delete the workspace.
 
 ![Debug source and breakpoint](./imgs/debug-source.png)
 
@@ -153,7 +155,7 @@ The **Breakpoints** view retains configured breakpoints for the entire workspace
 
 Breakpoint labels include the connection identity, including when a custom label is used. Toggling a breakpoint at the same source line removes all matching duplicate records while preserving other connections. The client does not clear historical breakpoints automatically. Select unused breakpoints in the **Breakpoints** view to remove them, or uncheck them to disable them.
 
-Selecting a breakpoint navigates to its source. After a source tab is closed or another view is selected, outdated asynchronous source results are ignored so the tab is not reopened and focus is not taken back.
+In **Breakpoints**, a single click selects a breakpoint; double-click to open its source and navigate to the breakpoint line. Merely switching to the Breakpoints or another view tab does not open source automatically. On initial or slow loading, execution-line and instruction-pointer positioning waits until the source document has loaded. After a source tab is closed or another view is selected, outdated asynchronous source results are ignored so the tab is not reopened and focus is not taken back.
 
 ## 7. Package compilation and error navigation
 
@@ -179,14 +181,16 @@ If a distributed server does not support forced invalid Package bodies or compil
 
 Validation of the 2026-11-02 repair build:
 
-- Product build: 204/204 Maven modules succeeded.
-- Main regression: 2,969 total, 2,785 passed, 184 conditionally skipped, zero failures or errors; R3 adds 69 regression cases.
+- R4 product build: 204/204 Maven modules succeeded. The extracted release archive passed manifest verification for 1,202 entries; the six production bundles involved in the repair match the GUI acceptance copy.
+- Main regression: 2,998 total, 2,814 passed, 184 conditionally skipped, zero failures or errors; R4 adds 29 regression cases and retains the 69 cases added in R3.
+- R4 live GUI checks preserve a real R3 workspace breakpoint across the version restart. Single-click selects without opening an editor. Cold double-click, double-click while the object is on Properties, and the Go to File context action all navigate to source line 6. An injected eight-second source-query delay still ends at line 6. Repeated single-clicks after closing all editors do not reopen source.
+- R4 launch checks: Run Configurations lists only other runnable types. The saved database configuration in Debug Configurations remains valid with Debug enabled. An actual run_demo Package launch pauses with both caret and execution annotation at line 6, then continues to completion with rollback selected.
 - R3 live GUI checks: explicit per-launch Package acknowledgement; declining leaves no live debug targets or processes. Initial suspend, double-click reopening and three-level F7 navigation place both caret and execution annotation at lines 6, 4 and 6. Closing source or using a native mouse click to return to Breakpoints remains stable for 10 seconds without reopening or focus theft.
 - Previously completed in R2: Kylin V10 x86_64 GUI connected to a local centralized GaussDB 507 server: 100 bulk schemas, approximately 15,000 procedures, 3,000 functions, 208 packages and 3,900 synthetic composite types in the database.
 - Previously completed in R2: each of two JDBC drivers completed three refresh rounds, with 500 tasks and 12 worker threads per round. The driver concurrency exception reproduced with the previous build did not recur.
 - Previously completed in R2: M-mode main and metadata connection initialization, table data reading and debug parameter panel creation passed.
 - R2 adds 23 regression cases. GUI checks cover restored duplicate breakpoints across restart, removing matches while preserving another connection, selecting run_demo in a new configuration, F7 into build_result and calc_amount with three frames, frame-specific variables and correct source, and F8 producing amount 30. Commit adds a row; a subsequent rollback leaves the row count unchanged.
-- R3 GUI validation used a Rosetta-translated container on Apple Silicon and a centralized 507 server. R2 previously checked a 505 JDBC driver against that server. These checks do not constitute 505 server or native x86 virtual-desktop acceptance.
+- R4 and R3 GUI validation used a Rosetta-translated Kylin V10 x86_64 container on Apple Silicon and a centralized 507 ORA server. R2 previously checked a 505 JDBC driver against that server. These checks do not constitute 505 server or native x86 virtual-desktop acceptance.
 
 The 2026-10-14 baseline previously passed centralized and distributed 505 live-database and independent acceptance checks. That full historical suite was not rerun for this repair build. Persistent loading in a target environment still needs an upgrade retest to establish whether its cause matches the repaired driver concurrency exception.
 
