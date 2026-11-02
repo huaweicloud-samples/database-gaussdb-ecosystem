@@ -1,5 +1,7 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
+构建版本：`26.1.5.202611021100`；更新日期：2026-11-02。沿用原 Release 标签，安装包、文件清单和校验文件替换为本次构建。
+
 ## 1. 概述
 
 本版本基于 DBeaver 26.1.5 官方源码及其 GaussDB 核心插件进行增强，面向 GaussDB 日常开发、存储过程调试和 Package 管理场景。
@@ -16,8 +18,8 @@
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-20261014)
-- 源码修订：`3a20ec0742936c1bcfa861e2f0470b1eb980e8d4`
+- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102)
+- 源码修订：`76dd84139e2d2e8b37e8f4507e4ac7e25fd45079`
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -39,20 +41,20 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
 
 - [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014)
-- [DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.PRODUCT-MANIFEST.json)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
 - [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/SHA256SUMS)
 
 SHA-256：
 
 ```text
-9ce40956dde52360ca3928f600b2d3fd5add036c174c6c9261105a932bfe1484  DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz
+bea7cc5bdb9fea0f1f54a5fdf54ba8d2bd71d825168c38d6462917fcdf845d2e  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
 ```
 
 下载后执行：
 
 ```bash
-sha256sum DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
 uname -m
 ```
 
@@ -63,8 +65,8 @@ uname -m
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
 ```bash
-tar -xzf DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz
-cd linux-x86_64/dbeaver
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+cd dbeaver
 ./dbeaver
 ```
 
@@ -97,6 +99,8 @@ chmod +x dbeaver
 6. 点击“测试连接”，确认数据库版本、兼容模式和当前用户均符合预期。
 
 客户端不会在后台静默修改会话级私有参数。若特定服务端能力要求额外参数，能力检查或错误信息会明确提示，由用户或数据库管理员确认后显式设置。
+
+GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的语句和结果读取互斥，避免多 Schema 并发刷新触发驱动内部异常；不同连接仍可并行。旧工作区或自定义驱动若显式启用了此选项，请在“数据库 → 驱动管理器 → 编辑驱动”中取消后重新连接。这是客户端选项，不修改数据库会话参数。
 
 ## 6. 调试存储过程或函数
 
@@ -157,17 +161,16 @@ chmod +x dbeaver
 
 ## 8. 验证结果
 
-该发布对应的验证结果如下：
+2026-11-02 修复构建的验证结果：
 
 - 产品构建：204/204 个 Maven 模块成功。
-- 打包测试：43/43 通过。
-- 主工程回归：2867 项，2683 通过、184 项按环境条件跳过、0 失败、0 错误。
-- 独立验收门禁：337/337 通过。
-- GaussDB 505 分布式真库验收通过。
-- GaussDB 505 集中式真库验收 12/12 通过，包括调试协议、会话控制和三层 Package 调用栈。
-- 麒麟 V10 x86_64 最终归档完成全新工作区、简体中文界面和 GaussDB 调试插件冷启动验证。
+- 主工程回归：2877 项，2693 通过、184 项按条件跳过、0 失败、0 错误。
+- 麒麟 V10 x86_64 图形环境连接本地 GaussDB 507 集中式真库；100 个批量 Schema，数据库约 1.5 万个过程、3000 个函数、208 个包和 3900 个合成复合类型。
+- 两份 JDBC 驱动各完成三轮并发刷新；每轮 500 个任务、12 个工作线程。旧版复现的驱动并发异常未再出现。
+- M 模式主连接和元数据连接初始化、表数据读取、调试参数面板创建通过。
+- 本轮使用 Apple Silicon 上的 Rosetta 转译容器；505 JDBC 驱动在 507 服务端验证，不等同于 505 服务端或原生 x86 桌面云验收。
 
-本次 x86_64 图形界面验证在麒麟 V10 x86_64 用户态环境中完成，宿主机使用指令转换运行；该结果不替代目标物理机或桌面云的最终准入验收。
+此前 2026-10-14 基线完成过 505 集中式、分布式真库及独立验收；本次没有重新运行该历史验收的全部场景。目标环境持续加载是否与已修复的驱动并发异常为同一原因，仍需升级后现场复测。
 
 ## 9. 当前边界
 

@@ -1,5 +1,7 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
+Build: `26.1.5.202611021100`; updated on 2026-11-02. The original release tag is retained; the archive, product manifest and checksums are replaced with this build.
+
 ## 1. Overview
 
 This edition is based on the official DBeaver 26.1.5 source tree and its GaussDB core plug-in. It extends DBeaver for GaussDB application development, stored routine debugging, and Package management.
@@ -16,8 +18,8 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-20261014)
-- Source revision: `3a20ec0742936c1bcfa861e2f0470b1eb980e8d4`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102)
+- Source revision: `76dd84139e2d2e8b37e8f4507e4ac7e25fd45079`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -39,20 +41,20 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
 - [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014)
-- [DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.PRODUCT-MANIFEST.json)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
 - [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/SHA256SUMS)
 
 SHA-256:
 
 ```text
-9ce40956dde52360ca3928f600b2d3fd5add036c174c6c9261105a932bfe1484  DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz
+bea7cc5bdb9fea0f1f54a5fdf54ba8d2bd71d825168c38d6462917fcdf845d2e  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
 uname -m
 ```
 
@@ -63,8 +65,8 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf DBeaver-GaussDB-26.1.5-202610140553-KylinV10-x86_64.tar.gz
-cd linux-x86_64/dbeaver
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+cd dbeaver
 ./dbeaver
 ```
 
@@ -97,6 +99,8 @@ The distribution does not bundle a GaussDB JDBC driver. Use an organization-appr
 6. Run **Test Connection** and confirm the server version, compatibility mode, and user.
 
 The client does not silently alter private session parameters. If a server capability requires an additional parameter, the capability check or server error reports it explicitly so that a user or database administrator can review and set it deliberately.
+
+Built-in GaussDB drivers disable “Thread safe driver” by default, serializing statements and result reading on each connection to avoid driver concurrency failures during multi-schema refresh. Separate connections remain parallel. If an old workspace or custom driver explicitly enables this option, disable it in Database → Driver Manager → Edit and reconnect. This is a client setting and does not alter database session parameters.
 
 ## 6. Debug a stored procedure or function
 
@@ -157,17 +161,16 @@ If a distributed server does not support forced invalid Package bodies or compil
 
 ## 8. Validation results
 
-The release was validated as follows:
+Validation of the 2026-11-02 repair build:
 
 - Product build: 204/204 Maven modules succeeded.
-- Packaging tests: 43/43 passed.
-- Main project regression: 2,867 total, 2,683 passed, 184 conditionally skipped, 0 failed, and 0 errors.
-- Independent acceptance gate: 337/337 passed.
-- GaussDB 505 distributed live-database acceptance passed.
-- GaussDB 505 centralized live-database acceptance passed 12/12, including debug protocol, session control, and a three-frame Package call stack.
-- The final Kylin V10 x86_64 archive passed a clean-workspace, Simplified Chinese UI, and GaussDB debug plug-in cold-start check.
+- Main regression: 2,877 total, 2,693 passed, 184 conditionally skipped, zero failures or errors.
+- Kylin V10 x86_64 GUI connected to a local centralized GaussDB 507 server: 100 bulk schemas, approximately 15,000 procedures, 3,000 functions, 208 packages and 3,900 synthetic composite types in the database.
+- Each of two JDBC drivers completed three refresh rounds, with 500 tasks and 12 worker threads per round. The driver concurrency exception reproduced with the previous build did not recur.
+- M-mode main and metadata connection initialization, table data reading and debug parameter panel creation passed.
+- This run used a Rosetta-translated container on Apple Silicon. The 505 JDBC driver was tested against a 507 server; this does not constitute 505 server or native x86 virtual-desktop acceptance.
 
-The x86_64 GUI check used a Kylin V10 x86_64 user space with instruction translation on the host. It does not replace final admission testing on the target physical machine or virtual desktop.
+The 2026-10-14 baseline previously passed centralized and distributed 505 live-database and independent acceptance checks. That full historical suite was not rerun for this repair build. Persistent loading in a target environment still needs an upgrade retest to establish whether its cause matches the repaired driver concurrency exception.
 
 ## 9. Current boundaries
 
