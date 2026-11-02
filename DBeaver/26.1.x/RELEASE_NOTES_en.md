@@ -1,8 +1,8 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Release Notes
 
-Build: `26.1.5.202611021100`; updated on 2026-11-02. The original release tag is retained; the archive, product manifest and checksums are replaced with this build.
+Build: `26.1.5.202611021100`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
 
-Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014`
+Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102`
 
 ## Assets
 
