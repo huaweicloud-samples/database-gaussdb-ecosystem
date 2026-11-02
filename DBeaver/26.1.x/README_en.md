@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.202611021100`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.202611022032`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
 
 ## 1. Overview
 
@@ -18,8 +18,8 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102)
-- Source revision: `76dd84139e2d2e8b37e8f4507e4ac7e25fd45079`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102-r2)
+- Source revision: `06183e4d70614e87a5440b6d1663e4aa71b7d762`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -40,21 +40,21 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2/SHA256SUMS)
 
 SHA-256:
 
 ```text
-bea7cc5bdb9fea0f1f54a5fdf54ba8d2bd71d825168c38d6462917fcdf845d2e  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+b41981f14ef8d444c89a29a72ff6ee321d0675eb3937c877613ea325daa65e73  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz
 uname -m
 ```
 
@@ -65,7 +65,7 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -139,6 +139,14 @@ At the end of a session, choose whether to commit or roll back data changes prod
 
 ![Debug transaction choice](./imgs/debug-transaction-choice.png)
 
+### 6.4 Selecting Package members
+
+Package members are separate from standalone procedures/functions under a schema. In a new DBeaver debug configuration, select the connection, then expand Schema → pkg_debug_demo → Packages → demo_pkg → Procedures → run_demo in the routine chooser. Package functions are under the same package's Functions folder. run_demo has no input parameters. Review and explicitly confirm the displayed transaction-scoped search_path setting, then apply and debug.
+
+[Runnable Package SQL and step-by-step test instructions (Chinese)](./examples/package-debug/使用说明.txt). Execute 01_prepare.sql, 02_package_spec.sql and 03_package_body.sql in order. Execute each package specification/body as one complete statement; gsql requires a separate trailing `/` line for each. Use an ORA/A test database.
+
+R2 repairs the missing Package branch in the chooser and source lookup for members not previously expanded. The Breakpoints view retains workspace history after a session ends. R2 displays connection identities and removes all matching duplicate markers when toggling that line; unrelated connections are preserved.
+
 ## 7. Package compilation and error navigation
 
 1. Expand **Packages** under a schema in a Package-capable database.
@@ -164,10 +172,11 @@ If a distributed server does not support forced invalid Package bodies or compil
 Validation of the 2026-11-02 repair build:
 
 - Product build: 204/204 Maven modules succeeded.
-- Main regression: 2,877 total, 2,693 passed, 184 conditionally skipped, zero failures or errors.
+- Main regression: 2,900 total, 2,716 passed, 184 conditionally skipped, zero failures or errors.
 - Kylin V10 x86_64 GUI connected to a local centralized GaussDB 507 server: 100 bulk schemas, approximately 15,000 procedures, 3,000 functions, 208 packages and 3,900 synthetic composite types in the database.
 - Each of two JDBC drivers completed three refresh rounds, with 500 tasks and 12 worker threads per round. The driver concurrency exception reproduced with the previous build did not recur.
 - M-mode main and metadata connection initialization, table data reading and debug parameter panel creation passed.
+- R2 adds 23 regression cases. GUI checks cover restored duplicate breakpoints across restart, removing matches while preserving another connection, selecting run_demo in a new configuration, F7 into build_result and calc_amount with three frames, frame-specific variables and correct source, and F8 producing amount 30. Commit adds a row; a subsequent rollback leaves the row count unchanged.
 - This run used a Rosetta-translated container on Apple Silicon. The 505 JDBC driver was tested against a 507 server; this does not constitute 505 server or native x86 virtual-desktop acceptance.
 
 The 2026-10-14 baseline previously passed centralized and distributed 505 live-database and independent acceptance checks. That full historical suite was not rerun for this repair build. Persistent loading in a target environment still needs an upgrade retest to establish whether its cause matches the repaired driver concurrency exception.

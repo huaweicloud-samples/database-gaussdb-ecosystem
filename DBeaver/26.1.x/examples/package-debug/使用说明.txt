@@ -1,0 +1,85 @@
+GaussDB Package 调试样例
+
+一、样例放在哪里
+Package 是数据库对象，创建在 GaussDB 中。DBeaver 是操作客户端，不需要向 DBeaver 安装 Package。
+适用于支持 Package 和 DBE_PLDEBUGGER 的 GaussDB ORA/A 测试库，M 模式不适用。请选择有图形界面的 DBeaver GaussDB 增强版。
+使用专门的测试数据库、测试账号，并在同一数据库、同一用户下创建和调试。分布式调试端与执行端需要连接同一 CN；测试时优先配置固定 CN 地址。
+
+二、脚本与执行顺序
+1. 在 DBeaver 左侧选中测试连接，右键“SQL 编辑器 → 新建 SQL 脚本”（也可从顶部 SQL 编辑器菜单打开）。确认编辑器绑定的连接和数据库正确。
+2. 打开或粘贴 01_prepare.sql，执行 CREATE SCHEMA 和 CREATE TABLE 两条语句。可用 Alt+X 执行这个文件，也可逐条选中后 Ctrl+Enter。
+3. 打开或粘贴 02_package_spec.sql，选中整个 CREATE PACKAGE ... END demo_pkg;，一次 Ctrl+Enter 执行整个包规格。
+4. 打开或粘贴 03_package_body.sql，选中整个 CREATE PACKAGE BODY ... END demo_pkg;，一次 Ctrl+Enter 执行整个包体。
+   不要把包体内部的单条语句单独执行。这里三个文件的结尾没有独立斜杠；它们按完整语句执行。若使用 gsql，规格和包体各自需要在末尾另起一行输入 / 提交 PL/SQL 块。
+5. 如果提示 Schema 已存在，先确认是不是上次样例留下的对象，不要覆盖其他人的对象。样例不自动删除已有对象。
+6. 在没有未提交业务修改的干净 SQL 连接中，按顺序执行 04_normal_call.sql。
+   它开始一个事务，调用 run_demo，读取结果，然后回滚。预期新增行：package-demo、3、10.00、30.00；回滚后这行消失。
+   ROLLBACK 会回滚该连接整个事务，所以不要在有其他待保存修改的连接中执行。
+
+三、这个包里有什么
+包名：pkg_debug_demo.demo_pkg。
+run_demo：无输入参数，推荐作为首次调试入口。
+build_result：含两个 IN 参数和一个 OUT 参数，中间调用层。
+calc_amount：包内函数，计算数量乘单价。
+调用链：run_demo → build_result → calc_amount。
+正常参数：数量 3，单价 10，金额 30。run_demo 最后把结果插入 pkg_debug_demo.demo_result。
+
+四、调试权限
+在目标连接中运行：
+SELECT current_user, current_database();
+SELECT pg_catalog.pg_has_role(current_user, 'gs_role_pldebugger', 'member');
+普通调试账号需要有调试角色；缺少权限时由数据库管理员执行：
+GRANT gs_role_pldebugger TO "实际调试用户名";
+随后断开并重新连接 DBeaver。无需为了这个样例授予 SYSADMIN。
+脚本本身不设置私有会话参数。若客户端对 Package 调试显示必须设置的参数及确认框，应阅读名称、值和作用范围后按测试环境要求明确选择。
+
+五、从 DBeaver 启动
+1. 在数据库导航树刷新连接或 Schema。
+2. 展开：连接 → 数据库 → 目标数据库 → 模式（Schema）→ pkg_debug_demo → 包（Packages）→ demo_pkg。
+   包内成员可能按“存储过程”“函数”分别显示。选择过程 run_demo，不是选择包规格本身。
+3. 双击 run_demo，打开源码。找到 build_result(v_qty, v_price, v_amount); 这条语句，在行号左侧双击加断点。
+4. 右键 run_demo → 调试（Debug As）→ GaussDB 对应调试入口。
+   如果用“数据库调试配置”：左侧选择 DBeaver 类型，新增配置；选对数据源，Routine 重新选择包内 run_demo。不要选择 Launch Group。
+5. run_demo 无 IN 参数，因此不用填写参数值。应用后启动。
+6. 提示切换调试透视图时选择切换。通过“窗口 → 显示视图”打开调用堆栈、变量、断点和表达式/监视视图（名称随语言包显示可能略有差异）。
+
+六、建议测试步骤与预期
+场景 A：包内调用、断点、单步、堆栈
+- 先确认 run_demo 在源码标记 BP1 的调用语句处暂停，局部变量初始化完成后 v_qty=3、v_price=10、v_amount=0。
+- F7 进入 build_result；再在 calc_amount 调用处 F7 进入 calc_amount。可能需要多次 F7 才走过入口/声明行。
+- 在 calc_amount 的乘法语句上 F8 执行，之后 v_amount=30。
+- 查看调用堆栈、切换栈帧检查各层局部变量。有些服务端版本会省略 Package 内部的中间栈帧，需记录实际结果，不能把两层强说成三层。
+- Shift+F7 单步退出到调用者，F8 或 F9 继续。
+- 回到 run_demo 的 INSERT 前，v_amount 应为 30。
+
+场景 B：修改变量
+- 重新启动 run_demo，在 BP1 暂停并确认尚未调用 build_result。
+- 在变量视图把 run_demo 当前帧的 v_qty 从 3 改成 5（双击值或用编辑值入口）。
+- 再执行调用，INSERT 前 v_amount 应为 50。
+- 可把 v_qty、v_price、v_amount 加入监视；先使用变量名，不把任意表达式求值当成已支持。
+
+场景 C：调试提交与回滚
+- 先从单独的 SQL 连接执行 05_check_results.sql，记录原有行数。
+- 调试 run_demo 至结束，选择“回滚”，再查表：不应新增行。
+- 再调试一次至结束，选择“提交”，再查表：应新增一行，默认 3、10、30；在 BP1 把数量改为 5 时应为 5、10、50。
+- 调试时仅暂停在 INSERT 之前，还没真正写入数据；必须让 INSERT 执行完才能验证事务结果。
+
+场景 D：终止
+- 启动到断点暂停后按 F10，观察会话结束，再查询结果表。不要把“暂停态终止”当作“长 SQL 执行中终止”验证，这个样例没有 pg_sleep 长查询。
+
+七、包编译
+选择 demo_pkg，右键选择整体、规格或包体编译入口。正常样例应编译成功。
+本样例没有故意生成无效包体，不用它声称已覆盖编译错误行号定位。不要通过随意破坏业务包源码测试。
+
+八、常见问题
+- Routine ... not found：刷新 Schema，在调试配置里重新选择当前包内成员；重建 Package 后成员 OID 可能变化。
+- must be ... gs_role_pldebugger：按第四节授权并重连。
+- CREATE PACKAGE 不支持：确认是 ORA/A 库，以及目标版本/部署实际具备 Package 能力；客户端不能替服务端添加 Package 支持。
+- 创建成功但看不到包：刷新 Schema，检查导航过滤器和创建用户、数据库是否与当前连接一致。
+
+九、清理
+停止调试，提交/回滚完毕，确认只涉及本样例后，可选中执行 06_cleanup.sql。它删除本样例的 Package、结果表和 Schema，没有 CASCADE。
+
+十、本次验证范围
+2026-11-02：本地 GaussDB 507 集中式 ORA/A 隔离测试库中，规格、包体创建、普通调用和清理脚本通过。R2 客户端在麒麟 V10 x86_64 转译容器中通过新配置选择包内 run_demo，F7 进入 build_result、calc_amount，显示三层栈帧、正确源码和各帧变量；F8 后 v_amount=30。调试提交后独立连接读到一行 3、10、30；再次调试并回滚后行数保持一行。
+这是合成样例的已测范围，不代表目标客户原生桌面云或 505 服务端已完成本轮验收。变量改值、监视、F10 终止及编译错误定位等说明中的其他操作没有用本份新样例逐项重跑，不能据此算作本轮通过。
