@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.202611021100`; updated on 2026-11-02. The original release tag is retained; the archive, product manifest and checksums are replaced with this build.
+Build: `26.1.5.202611021100`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
 
 ## 1. Overview
 
@@ -40,10 +40,10 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/SHA256SUMS)
 
 SHA-256:
 

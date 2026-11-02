@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-构建版本：`26.1.5.202611021100`；更新日期：2026-11-02。沿用原 Release 标签，安装包、文件清单和校验文件替换为本次构建。
+构建版本：`26.1.5.202611021100`；更新日期：2026-11-02。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
 
 ## 1. 概述
 
@@ -40,10 +40,10 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261014/SHA256SUMS)
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/SHA256SUMS)
 
 SHA-256：
 
