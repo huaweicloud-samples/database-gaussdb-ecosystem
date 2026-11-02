@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-构建版本：`26.1.5.202611021100`；更新日期：2026-11-02。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
+构建版本：`26.1.5.202611022032`；更新日期：2026-11-02。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
 
 ## 1. 概述
 
@@ -18,8 +18,8 @@
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102)
-- 源码修订：`76dd84139e2d2e8b37e8f4507e4ac7e25fd45079`
+- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102-r2)
+- 源码修订：`06183e4d70614e87a5440b6d1663e4aa71b7d762`
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -40,21 +40,21 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102/SHA256SUMS)
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r2/SHA256SUMS)
 
 SHA-256：
 
 ```text
-bea7cc5bdb9fea0f1f54a5fdf54ba8d2bd71d825168c38d6462917fcdf845d2e  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+b41981f14ef8d444c89a29a72ff6ee321d0675eb3937c877613ea325daa65e73  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz
 ```
 
 下载后执行：
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz
 uname -m
 ```
 
@@ -65,7 +65,7 @@ uname -m
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611021100.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-202611022032.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -139,6 +139,14 @@ GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的
 
 ![调试事务选择](./imgs/debug-transaction-choice.png)
 
+### 6.4 选择包内过程或函数
+
+Package 内的成员不属于 Schema 下的独立“存储过程／函数”列表。新建调试配置时，选择 DBeaver 类型及目标连接，再在“调试对象”选择器展开：模式 → pkg_debug_demo → 包 → demo_pkg → 存储过程 → run_demo。选择包内函数时，展开同一包的“函数”分支。run_demo 无输入参数，参数表为空正常；阅读页面显示的事务级 search_path 设置并明确确认后，点击应用、调试。
+
+[可直接创建的 Package SQL 样例及逐步测试说明](./examples/package-debug/使用说明.txt)。依次执行 01_prepare.sql、02_package_spec.sql、03_package_body.sql；包规格和包体分别作为完整语句执行。gsql 需要各自在末尾另起一行输入 `/`。样例只用于 ORA/A 测试库。
+
+R2 修复了选择器过滤掉 Package 分支、未预展开成员时源码查找失败的问题。断点视图会保留整个工作区的历史断点，结束会话并不自动删除；R2 显示连接标识，并在同一行切换时清除全部匹配的重复记录，不自动清空其他连接的断点。
+
 ## 7. Package 编译和错误定位
 
 1. 在支持 Package 的数据库中展开模式下的“包”。
@@ -164,10 +172,11 @@ GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的
 2026-11-02 修复构建的验证结果：
 
 - 产品构建：204/204 个 Maven 模块成功。
-- 主工程回归：2877 项，2693 通过、184 项按条件跳过、0 失败、0 错误。
+- 主工程回归：2900 项，2716 通过、184 项按条件跳过、0 失败、0 错误。
 - 麒麟 V10 x86_64 图形环境连接本地 GaussDB 507 集中式真库；100 个批量 Schema，数据库约 1.5 万个过程、3000 个函数、208 个包和 3900 个合成复合类型。
 - 两份 JDBC 驱动各完成三轮并发刷新；每轮 500 个任务、12 个工作线程。旧版复现的驱动并发异常未再出现。
 - M 模式主连接和元数据连接初始化、表数据读取、调试参数面板创建通过。
+- R2 新增 23 项回归测试；GUI 验证历史重复断点重启恢复、删除匹配项并保留其他连接；新配置选择包内 run_demo，F7 进入 build_result、calc_amount，三层堆栈、各帧变量与正确源码可用，F8 后金额为 30；提交增加一行、再次调试回滚后行数不变。
 - 本轮使用 Apple Silicon 上的 Rosetta 转译容器；505 JDBC 驱动在 507 服务端验证，不等同于 505 服务端或原生 x86 桌面云验收。
 
 此前 2026-10-14 基线完成过 505 集中式、分布式真库及独立验收；本次没有重新运行该历史验收的全部场景。目标环境持续加载是否与已修复的驱动并发异常为同一原因，仍需升级后现场复测。
