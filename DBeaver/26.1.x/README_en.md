@@ -141,9 +141,8 @@ At the end of a session, choose whether to commit or roll back data changes prod
 
 ### 6.4 Selecting Package members
 
-Package members are separate from standalone procedures/functions under a schema. In a new DBeaver debug configuration, select the connection, then expand Schema → pkg_debug_demo → Packages → demo_pkg → Procedures → run_demo in the routine chooser. Package functions are under the same package's Functions folder. run_demo has no input parameters. Review and explicitly confirm the displayed transaction-scoped search_path setting, then apply and debug.
+Package members are separate from standalone procedures/functions under a schema. In a new DBeaver debug configuration, select the connection, then expand Schema → target schema → Packages → target package → Procedures → target member in the routine chooser. Package functions are under the same package's Functions folder. For a member with no input parameters, an empty parameter table is expected. Review and explicitly confirm the displayed transaction-scoped search_path setting, then apply and debug.
 
-[Runnable Package SQL and step-by-step test instructions (Chinese)](./examples/package-debug/使用说明.txt). Execute 01_prepare.sql, 02_package_spec.sql and 03_package_body.sql in order. Execute each package specification/body as one complete statement; gsql requires a separate trailing `/` line for each. Use an ORA/A test database.
 
 R2 repairs the missing Package branch in the chooser and source lookup for members not previously expanded. The Breakpoints view retains workspace history after a session ends. R2 displays connection identities and removes all matching duplicate markers when toggling that line; unrelated connections are preserved.
 
