@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-构建版本：`26.1.5.20261103r5`；更新日期：2026-11-03。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
+构建版本：`26.1.5.20261103r6`；更新日期：2026-11-03。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
 
 ## 1. 概述
 
@@ -13,13 +13,14 @@
 - 单步进入（F7）、单步跳过（F8）、单步退出（Shift+F7）、继续（F9）和终止（F10）。
 - 断点新增、启用、禁用、删除和统一管理。
 - 局部变量查看与修改、监视变量、调用堆栈及源码跳转。
+- `refcursor` / `sys_refcursor` 游标状态摘要、只读属性展开及属性监视。
 - 调试结束后的提交或回滚选择。
 - Package 规格、包体及整体编译，编译错误定位和批量删除。
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r5)
-- 源码修订：`a3bc9aac36070fbedea76d01d93796fc35780a9e`
+- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r6)
+- 源码修订：`590b4395c1c512257b95248a6d1bd26415f4c644`
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -29,7 +30,7 @@
 | --- | --- |
 | 客户端版本 | DBeaver 26.1.5 GaussDB 增强版 |
 | 客户端系统 | 麒麟 V10 x86_64 |
-| 已验数据库 | GaussDB 505.2.1.SPC0800，集中式与分布式 |
+| 已验数据库 | 历史基线：GaussDB 505.2.1.SPC0800 集中式与分布式；本次游标状态增强：GaussDB 507 集中式 ORA，具体结果见第 8 节 |
 | 数据库兼容模式 | 支持识别 ORA/A、MYSQL/B、TD/C、PG、M；具体功能按服务端能力开放 |
 | PL/SQL 调试 | 服务端具备 `DBE_PLDEBUGGER` 接口且用户有相应权限时开放 |
 | Package | 以支持 Package 的集中式 ORA 环境为完整能力范围；其他部署形态按服务端能力降级 |
@@ -40,21 +41,21 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/SHA256SUMS)
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/SHA256SUMS)
 
 SHA-256：
 
 ```text
-2b0e62f5e2c4e106d31352d30893f4af2f6186c68e324daba0fc990c9c824459  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
+b5e1492025d1c414bb71d69d8bf09aa34297b4d6875472a0ca674213b6df1a7c  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
 ```
 
 下载后执行：
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
 uname -m
 ```
 
@@ -65,7 +66,7 @@ uname -m
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -129,6 +130,16 @@ GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的
 
 在“变量”视图中可以查看局部变量；选择可修改变量后编辑其值。监视视图支持按变量名添加监视项。服务端拒绝的类型、常量或非法值会显示明确错误，不会伪装为修改成功。
 
+查看游标状态：
+
+1. 让过程在 `OPEN`、`FETCH` 或 `CLOSE` 之后的代码行暂停，打开“变量”视图。
+2. 找到类型为 `refcursor` 或 `sys_refcursor` 的变量。服务端提供可识别的状态时，其值显示摘要，例如 `(ROWCOUNT=1, ISOPEN=true, FOUND=true, NOTFOUND=false)`。
+3. 展开游标变量，查看只读子项 `%ISOPEN`（是否打开）、`%FOUND`（上次是否取到行）、`%NOTFOUND`（上次是否未取到行）和 `%ROWCOUNT`（服务端计数）。返回了游标名称时还会显示 `NAME`；包内游标还会显示 `PACKAGE`，用于区分不同包的同名游标。缺少的属性不会被补成 `false` 或 `0`；明确的空值显示 `NULL`。
+4. 在“表达式”视图添加游标变量名（例如 `cur`）可查看整个状态；添加 `cur%ROWCOUNT` 或 `cur%ISOPEN` 可监视单项属性。游标名称区分大小写，属性名不区分大小写；只支持变量名和上述属性，不执行任意表达式。若所选帧有多个包的同名游标，未限定作用域的属性监视会提示名称有歧义，此时在“变量”视图展开对应 `PACKAGE` 的游标查看。
+5. 单步执行，再查看下一次暂停时的值；切换调用栈帧后，显示所选帧的状态。保持“表达式”页签打开时，单步暂停不会强制切走到“断点”页签。
+
+游标本身与状态子项均只读。对无法识别、存在冲突或无法唯一归属的服务端数据，保留原始值或独立变量行，不猜测状态归属。客户端只解析 `info_locals()` 已返回的数据，不额外执行 `FETCH`，不重新执行原查询，也不设置新的私有会话参数。**这里显示的是游标状态，不是游标结果集；暂停期间尚不提供结果行、原 SQL 或列结构预览，需服务端新增接口后再适配。**
+
 ![单步和变量](./imgs/debug-step-variables.png)
 
 ### 6.3 调用堆栈与事务处理
@@ -179,7 +190,15 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 
 ## 8. 验证结果
 
-2026-11-03 修复构建的验证结果：
+2026-11-03 R6 构建的验证结果：
+
+- R6 游标状态：支持 507 `info_locals()` 的内联状态文本，以及按游标名称关联的旧式隐藏属性格式。按完整游标名称、Package 和栈帧精确关联；缺失、非法、重复及冲突数据保留可见信息。状态摘要与子项只读，支持游标整体及 `%ISOPEN`、`%FOUND`、`%NOTFOUND`、`%ROWCOUNT` 监视。
+- R6 监视刷新：保留变量与属性快照的稳定身份；暂停时只创建缺少的调试视图，不强制激活“变量／断点”，使当前“表达式”页签保持可见。
+- R6 主工程回归：3130 项，2946 通过、184 项按条件跳过、0 失败、0 错误；本次新增 87 项回归。
+- R6 真库协议验证：507 集中式 ORA，游标打开、FETCH 命中／未命中、关闭、多个游标及调用栈帧切换；86 项断言连续执行两轮，两轮均通过。旧式按名称隐藏属性格式以提供的协议样例做单元验证，未声明本次已在 505 服务端验证该格式。
+- R6 产品构建及图形验收：204 个 Maven 模块全部构建成功。最终 R6 在麒麟 V10 x86_64 转译容器中，使用全新工作区连接 507 集中式 ORA；真实“变量”和“表达式”视图中的游标及 cur%ROWCOUNT 监视随 OPEN、第一次和第二次 FETCH、耗尽后的 NOTFOUND、CLOSE 正确刷新。两个视图均能完整展开四项状态和 NAME，只读保护有效；所选栈帧、源码光标和执行箭头均匹配第 10 行。F9 正常执行至结束后选择回滚，确认无存活调试目标或进程并正常退出。6 个生产插件与最终图形验收副本字节一致，归档解压后通过 1202 项文件清单校验。同帧跨 Package 同名游标隔离与歧义检查由单元测试覆盖，本次不声明该组合已通过 GUI 验收。
+
+以下 R5、R4、R3、R2 为历史验证记录，不表示其全部场景已在 R6 重跑：
 
 - R5 修复调试完成状态同步：继续或单步后及时同步目标与线程的运行状态，清除过期调用栈；再次暂停时重新读取调用栈。等待提交/回滚期间禁用“继续”，忽略已排队但过期的继续操作，避免完成后的会话被当作仍可恢复的暂停会话。
 - R5 修复包内单步的结束识别：507 真库的独立 JDBC 协议探测发现，子过程执行到 END 时也可能返回 `[EXECUTION FINISHED]`，此时调用栈中仍有子帧和调用者。客户端现对返回标记做精确匹配，并在同一控制连接读取调用栈；有调用栈时继续按暂停处理，不以 OID 判断调用是否结束，以覆盖递归使用相同 OID 的情况。只有目标 CALL 成功返回才确认例程结束；调用栈查询仅将预期的 `D0005` 作为收尾信号，其他异常仍上报。该服务端行为已通过独立协议探测及下述新版客户端图形验证复核。
@@ -209,6 +228,7 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 - GaussDB JDBC 驱动、`gs_dump`、`gs_restore` 等数据库原生工具不随客户端分发。
 - PL/SQL 调试依赖服务端调试接口、兼容模式、例程语言和用户权限。
 - Package 错误定位依赖目标版本提供相应的 Package 和编译诊断能力。
+- 暂停调试中的局部游标仅支持服务端返回的状态；结果行、原 SQL 和列结构预览仍依赖后续内核接口。旧式按名称隐藏属性仅完成协议样例单测，本次真库覆盖的是 507 内联状态格式。
 - 首次用于目标环境时，应按照组织的软件准入流程核对摘要，并完成连接、调试、事务和 Package 场景验收。
 
 ## 10. 许可证

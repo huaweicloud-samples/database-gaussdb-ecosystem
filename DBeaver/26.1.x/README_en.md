@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.20261103r5`; updated on 2026-11-03. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.20261103r6`; updated on 2026-11-03. The release tag, archive, product manifest and checksums all identify this build.
 
 ## 1. Overview
 
@@ -13,13 +13,14 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 - Step Into (F7), Step Over (F8), Step Return (Shift+F7), Resume (F9), and Terminate (F10).
 - Breakpoint creation, enable/disable, deletion, and centralized management.
 - Local variable inspection and modification, watches, call stacks, and source navigation.
+- `refcursor` / `sys_refcursor` state summaries, read-only attributes, and attribute watches.
 - Commit or rollback selection when a debug session finishes.
 - Package specification, body, and full compilation, compile-error navigation, and batch deletion.
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r5)
-- Source revision: `a3bc9aac36070fbedea76d01d93796fc35780a9e`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r6)
+- Source revision: `590b4395c1c512257b95248a6d1bd26415f4c644`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -29,7 +30,7 @@ Source baselines:
 | --- | --- |
 | Client version | DBeaver 26.1.5 GaussDB Enhanced Edition |
 | Client platform | Kylin V10 x86_64 |
-| Validated database | GaussDB 505.2.1.SPC0800, centralized and distributed deployments |
+| Validated database | Historical baseline: centralized and distributed GaussDB 505.2.1.SPC0800; this cursor-state enhancement: centralized GaussDB 507 ORA; see section 8 for the validation scope |
 | Compatibility modes | Detects ORA/A, MYSQL/B, TD/C, PG, and M; features are enabled according to server capabilities |
 | PL/SQL debugging | Enabled when the server provides the required `DBE_PLDEBUGGER` signatures and the current user has permission |
 | Package management | Full capability is intended for Package-capable centralized ORA deployments; other deployments use capability-based fallback behavior |
@@ -40,21 +41,21 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/SHA256SUMS)
 
 SHA-256:
 
 ```text
-2b0e62f5e2c4e106d31352d30893f4af2f6186c68e324daba0fc990c9c824459  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
+b5e1492025d1c414bb71d69d8bf09aa34297b4d6875472a0ca674213b6df1a7c  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
 uname -m
 ```
 
@@ -65,7 +66,7 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -129,6 +130,16 @@ The generic **Run** > **Run Configurations...** menu remains available for other
 
 The **Variables** view displays local variables and permits supported values to be changed. The watch view accepts variable names. Server-rejected types, constants, and invalid values are displayed as errors and are never reported as successful updates.
 
+Inspect cursor state:
+
+1. Pause at a line after `OPEN`, `FETCH`, or `CLOSE` and open **Variables**.
+2. Find the `refcursor` or `sys_refcursor` variable. When the server supplies recognized state data, its value shows a summary such as `(ROWCOUNT=1, ISOPEN=true, FOUND=true, NOTFOUND=false)`.
+3. Expand the cursor to inspect the read-only `%ISOPEN`, `%FOUND`, `%NOTFOUND`, and `%ROWCOUNT` children. `NAME` is also shown when the server provides a portal name; Package cursors also expose `PACKAGE` to distinguish equal names from different packages. Missing attributes are never replaced with `false` or `0`; an explicit null is shown as `NULL`.
+4. In **Expressions**, add the cursor variable name, such as `cur`, to inspect its complete state, or `cur%ROWCOUNT` / `cur%ISOPEN` to watch one attribute. Cursor names are case-sensitive; attribute names are case-insensitive. Only variable names and these attributes are supported; arbitrary expressions are not executed. If several packages expose the same cursor name in the selected frame, an unqualified attribute watch reports an ambiguous name. Expand the cursor with the matching `PACKAGE` in Variables instead.
+5. Step and inspect the value at the next suspension. Selecting a different call frame displays that frame's state. Stepping no longer forces the visible **Expressions** tab to switch to **Breakpoints**.
+
+The cursor and its state children are read-only. Unrecognized, conflicting, or ambiguous data remains visible as the original value or separate variable rows. The client only interprets data already returned by `info_locals()`; it does not issue an additional `FETCH`, rerun the original query, or set new private session parameters. **This is cursor-state inspection, not a cursor result grid. Result rows, original SQL, and column structure are not available during a pause and require a future server interface.**
+
 ![Steps and variables](./imgs/debug-step-variables.png)
 
 ### 6.3 Call stack and transaction result
@@ -179,7 +190,15 @@ If a distributed server does not support forced invalid Package bodies or compil
 
 ## 8. Validation results
 
-Validation of the 2026-11-03 repair build:
+Validation of the 2026-11-03 R6 build:
+
+- R6 cursor state: supports the inline state text returned by 507 `info_locals()` and the older name-based hidden-attribute format. Attributes are matched by complete cursor name, Package, and frame; missing, invalid, duplicate, or conflicting data is preserved rather than guessed. Cursor summaries and children are read-only; watches support the cursor and its `%ISOPEN`, `%FOUND`, `%NOTFOUND`, and `%ROWCOUNT` attributes.
+- R6 watch refresh: retains stable variable and attribute snapshot identities. Suspension creates missing debug views without activating Variables or Breakpoints, preserving the visible Expressions tab.
+- R6 main regression: 3,130 cases, with 2,946 passed, 184 conditionally skipped, zero failures or errors; this build adds 87 regression cases.
+- R6 live protocol checks: centralized 507 ORA, covering OPEN, successful and unsuccessful FETCH, CLOSE, multiple cursors, and frame switching; 86 assertions per round, repeated twice with both rounds passing. The older name-based hidden format is unit-tested against supplied protocol fixtures; this release does not claim a new 505-server validation of that format.
+- R6 product build and GUI acceptance: All 204 Maven modules built successfully. The final R6 GUI ran in a translated Kylin V10 x86_64 container with a fresh workspace connected to centralized 507 ORA. The real Variables and Expressions views refreshed the cursor and cur%ROWCOUNT watch after OPEN, the first and second FETCH, exhaustion with NOTFOUND, and CLOSE. Both views expanded all four state attributes and NAME with read-only protection. The selected frame, source caret, and execution annotation aligned at line 10. F9 completed normally; rollback left no live debug target or process, and the client exited normally. The six production bundles match the final GUI copy byte for byte; the extracted archive passed all 1,202 manifest entries. Same-frame cursor isolation and ambiguity across Packages are unit-tested; this combination is not claimed as GUI-validated.
+
+The R5, R4, R3, and R2 entries below are historical records; their complete suites were not rerun with R6:
 
 - R5 fixes debug completion state synchronization. Continue and stepping synchronize target and thread running states and clear stale stack frames; the next suspension reads a fresh stack. Resume is disabled while commit/rollback is pending, and outdated queued resume actions are ignored, preventing completed sessions from being treated as resumable paused sessions.
 - R5 fixes completion detection during Package stepping. An independent JDBC protocol probe against a live 507 server found that reaching a child routine END can return `[EXECUTION FINISHED]` while child and caller frames remain. The client now matches the marker exactly and reads the backtrace on the same controller connection; a remaining stack is treated as a pause. It does not infer completion from routine OIDs, which may repeat in recursion. Routine completion requires the target CALL to return successfully; only the expected `D0005` backtrace state is treated as a completion signal, and other errors remain visible. This server behavior was confirmed by an independent protocol probe and the revised-client GUI checks below.
@@ -209,6 +228,7 @@ The 2026-10-14 baseline previously passed centralized and distributed 505 live-d
 - GaussDB JDBC, `gs_dump`, `gs_restore`, and other native database tools are not distributed with the client.
 - PL/SQL debugging depends on server debug APIs, compatibility mode, routine language, and user permissions.
 - Package error navigation depends on Package and compilation-diagnostic capabilities in the target server version.
+- Paused local cursors expose server-supplied state only. Result rows, original SQL, and column-structure previews require a future server interface. The older name-based hidden format is covered by protocol-fixture unit tests; the current live-server coverage uses the 507 inline format.
 - Before first use in a target environment, verify the digest and run organization-specific connection, debugging, transaction, and Package acceptance tests.
 
 ## 10. Licensing
