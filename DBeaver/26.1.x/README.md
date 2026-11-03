@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-构建版本：`26.1.5.20261102r4`；更新日期：2026-11-02。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
+构建版本：`26.1.5.20261103r5`；更新日期：2026-11-03。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
 
 ## 1. 概述
 
@@ -18,8 +18,8 @@
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102-r4)
-- 源码修订：`1218bef04bb343595f1250b285289450772800a1`
+- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r5)
+- 源码修订：`a3bc9aac36070fbedea76d01d93796fc35780a9e`
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -40,21 +40,21 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/SHA256SUMS)
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/SHA256SUMS)
 
 SHA-256：
 
 ```text
-ddeeb034de4024ae2ac7cee078bb16a9d9c996329d488eedf9cdc74a8f660773  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
+2b0e62f5e2c4e106d31352d30893f4af2f6186c68e324daba0fc990c9c824459  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
 ```
 
 下载后执行：
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
 uname -m
 ```
 
@@ -65,7 +65,7 @@ uname -m
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -179,10 +179,18 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 
 ## 8. 验证结果
 
-2026-11-02 修复构建的验证结果：
+2026-11-03 修复构建的验证结果：
+
+- R5 修复调试完成状态同步：继续或单步后及时同步目标与线程的运行状态，清除过期调用栈；再次暂停时重新读取调用栈。等待提交/回滚期间禁用“继续”，忽略已排队但过期的继续操作，避免完成后的会话被当作仍可恢复的暂停会话。
+- R5 修复包内单步的结束识别：507 真库的独立 JDBC 协议探测发现，子过程执行到 END 时也可能返回 `[EXECUTION FINISHED]`，此时调用栈中仍有子帧和调用者。客户端现对返回标记做精确匹配，并在同一控制连接读取调用栈；有调用栈时继续按暂停处理，不以 OID 判断调用是否结束，以覆盖递归使用相同 OID 的情况。只有目标 CALL 成功返回才确认例程结束；调用栈查询仅将预期的 `D0005` 作为收尾信号，其他异常仍上报。该服务端行为已通过独立协议探测及下述新版客户端图形验证复核。
+- R5 精确匹配错误响应标记：源码字符串或注释中的相似文字不会被误当作调试错误；真正的服务端错误标记仍终止本次调试并报告错误。
+- R5 主工程回归：3043 项，2859 通过、184 项按条件跳过、0 失败、0 错误；本次新增 45 项回归（19 项模型状态及竞态、26 项结束/错误标记识别）。下列 R4、R3、R2 图形验证为历史结果，不能视为已用 R5 重跑。
+- R5 真库图形验证：麒麟 V10 x86_64 转译容器连接 GaussDB 507 集中式 ORA。旧 R4 复现了“已结束”但调用栈仍有两帧、继续报 `not suspended` 的问题；R5 经 F7 进入 run_demo → build_result → calc_amount，跨过服务端返回的 build_result 第 0 行后返回 run_demo 第 8 行，再单步至正常完成。另一轮在 build_result 第 0 行确认仍可继续且未完成，点击“继续”后正常完成。
+- R5 事务验证：最终提交/回滚对话框显示期间，“继续”和单步动作均不可用。第一轮提交后独立连接查得 1 行；第二轮选择回滚后，独立连接行数仍为 1。
+- R5 产品构建：204/204 个 Maven 模块成功，6 个涉及修复的生产插件与实际图形验收副本字节一致。
 
 - R4 产品构建：204/204 个 Maven 模块成功；发布包解压后通过 1202 个文件条目的清单校验，6 个涉及修复的生产插件与图形验收副本一致。
-- 主工程回归：2998 项，2814 通过、184 项按条件跳过、0 失败、0 错误；R4 新增 29 项回归，并保留 R3 已新增的 69 项回归。
+- R4 主工程回归（历史）：2998 项，2814 通过、184 项按条件跳过、0 失败、0 错误；当时新增 29 项回归，并保留 R3 已新增的 69 项回归。
 - R4 真库图形验证：保留 R3 工作区中的真实断点跨版本重启。单击仅选中且不打开编辑器；双击首次打开、对象停在“属性”页后二次双击、右键“转至文件”均切到源码第 6 行。模拟源码查询延迟 8 秒后仍定位第 6 行；关闭全部编辑器后重复单击不重开源码。
 - R4 启动验证：“运行配置”只显示其他可运行类型，“调试配置”中保存的数据库配置有效且“调试”可用；实际启动包内 run_demo，暂停时光标和执行箭头均位于第 6 行，继续后选择回滚并结束会话。
 - R3 真库图形验证：包内调试逐次明确确认，取消后无存活调试目标或进程；初次暂停、双击重开、F7 三层调用的光标和执行箭头分别匹配源码第 6、4、6 行。关闭源码或真实鼠标切回断点页后，等待 10 秒不重开或抢回焦点。
