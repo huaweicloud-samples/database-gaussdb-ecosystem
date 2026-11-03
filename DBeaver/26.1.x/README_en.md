@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.20261102r4`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.20261103r5`; updated on 2026-11-03. The release tag, archive, product manifest and checksums all identify this build.
 
 ## 1. Overview
 
@@ -18,8 +18,8 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261102-r4)
-- Source revision: `1218bef04bb343595f1250b285289450772800a1`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r5)
+- Source revision: `a3bc9aac36070fbedea76d01d93796fc35780a9e`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -40,21 +40,21 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5/SHA256SUMS)
 
 SHA-256:
 
 ```text
-ddeeb034de4024ae2ac7cee078bb16a9d9c996329d488eedf9cdc74a8f660773  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
+2b0e62f5e2c4e106d31352d30893f4af2f6186c68e324daba0fc990c9c824459  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
 uname -m
 ```
 
@@ -65,7 +65,7 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -179,10 +179,18 @@ If a distributed server does not support forced invalid Package bodies or compil
 
 ## 8. Validation results
 
-Validation of the 2026-11-02 repair build:
+Validation of the 2026-11-03 repair build:
+
+- R5 fixes debug completion state synchronization. Continue and stepping synchronize target and thread running states and clear stale stack frames; the next suspension reads a fresh stack. Resume is disabled while commit/rollback is pending, and outdated queued resume actions are ignored, preventing completed sessions from being treated as resumable paused sessions.
+- R5 fixes completion detection during Package stepping. An independent JDBC protocol probe against a live 507 server found that reaching a child routine END can return `[EXECUTION FINISHED]` while child and caller frames remain. The client now matches the marker exactly and reads the backtrace on the same controller connection; a remaining stack is treated as a pause. It does not infer completion from routine OIDs, which may repeat in recursion. Routine completion requires the target CALL to return successfully; only the expected `D0005` backtrace state is treated as a completion signal, and other errors remain visible. This server behavior was confirmed by an independent protocol probe and the revised-client GUI checks below.
+- R5 matches error-response markers exactly, so similar text inside source strings or comments is not mistaken for a debug failure. Genuine server error markers still terminate the debug session and report the error.
+- R5 main regression: 3,043 total, 2,859 passed, 184 conditionally skipped, zero failures or errors; this build adds 45 regression cases (19 model-state and race cases, and 26 completion/error-marker cases). The R4, R3 and R2 GUI checks below are historical results and were not rerun with R5.
+- R5 live GUI checks: a translated Kylin V10 x86_64 container connected to centralized GaussDB 507 ORA. R4 reproduced a completed state with two stack frames still present, followed by `not suspended` on Continue. In R5, F7 entered run_demo → build_result → calc_amount, crossed the server-reported build_result line 0, returned to run_demo line 8, and stepped to normal completion. A second run remained resumable and incomplete at build_result line 0; clicking Continue completed normally.
+- R5 transaction checks: Resume and stepping actions were disabled while the final commit/rollback dialog was displayed. After the first run committed, an independent connection read one row. The second run rolled back, and the independent row count remained one.
+- R5 product build: 204/204 Maven modules succeeded. The six production bundles involved in the repair are byte-identical to those used for GUI acceptance.
 
 - R4 product build: 204/204 Maven modules succeeded. The extracted release archive passed manifest verification for 1,202 entries; the six production bundles involved in the repair match the GUI acceptance copy.
-- Main regression: 2,998 total, 2,814 passed, 184 conditionally skipped, zero failures or errors; R4 adds 29 regression cases and retains the 69 cases added in R3.
+- Historical R4 main regression: 2,998 total, 2,814 passed, 184 conditionally skipped, zero failures or errors; R4 added 29 regression cases and retained the 69 cases added in R3.
 - R4 live GUI checks preserve a real R3 workspace breakpoint across the version restart. Single-click selects without opening an editor. Cold double-click, double-click while the object is on Properties, and the Go to File context action all navigate to source line 6. An injected eight-second source-query delay still ends at line 6. Repeated single-clicks after closing all editors do not reopen source.
 - R4 launch checks: Run Configurations lists only other runnable types. The saved database configuration in Debug Configurations remains valid with Debug enabled. An actual run_demo Package launch pauses with both caret and execution annotation at line 6, then continues to completion with rollback selected.
 - R3 live GUI checks: explicit per-launch Package acknowledgement; declining leaves no live debug targets or processes. Initial suspend, double-click reopening and three-level F7 navigation place both caret and execution annotation at lines 6, 4 and 6. Closing source or using a native mouse click to return to Breakpoints remains stable for 10 seconds without reopening or focus theft.

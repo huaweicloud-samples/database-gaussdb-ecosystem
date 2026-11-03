@@ -1,8 +1,8 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Release Notes
 
-Build: `26.1.5.20261102r4`; updated on 2026-11-02. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.20261103r5`; updated on 2026-11-03. The release tag, archive, product manifest and checksums all identify this build.
 
-Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261102-r4`
+Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r5`
 
 ## Assets
 
@@ -10,8 +10,8 @@ This release contains only the Kylin V10 x86_64 edition:
 
 | File | Purpose | SHA-256 |
 | --- | --- | --- |
-| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.tar.gz` | Client archive | `ddeeb034de4024ae2ac7cee078bb16a9d9c996329d488eedf9cdc74a8f660773` |
-| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261102-r4.PRODUCT-MANIFEST.json` | Package file manifest | `1b680f84f491e6cb0f3132530857253abcc0814f975dbb0439030abfca9331b7` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.tar.gz` | Client archive | `2b0e62f5e2c4e106d31352d30893f4af2f6186c68e324daba0fc990c9c824459` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r5.PRODUCT-MANIFEST.json` | Package file manifest | `16a3ac63a8aabd401ecb9580140bf86a14fca84cd67d87bdd40b769d9f23bb25` |
 | `SHA256SUMS` | Checksum entry point for the two payload files above | Generated and read back during publication |
 
 ## Highlights
@@ -25,10 +25,17 @@ This release contains only the Kylin V10 x86_64 edition:
 
 ## Repairs and validation in this build
 
+- R5: Synchronize target and thread states across continue, stepping and completion. Clear stale stack frames when running and refresh them at the next suspension. Disable Resume while commit/rollback is pending; outdated resume requests no longer change the completed session state.
+- R5: Fix premature completion when a Package child routine END returns `[EXECUTION FINISHED]`. Match the marker exactly and check the backtrace on the same controller connection for a remaining pause, without relying on OIDs to distinguish call levels. Confirm completion only after the target CALL returns successfully; accept only the expected `D0005` completion state and preserve other errors. This server behavior was confirmed by an independent live-507 JDBC protocol probe and R5 client GUI acceptance.
+- R5: Match error markers exactly to prevent false failures from source strings and comments. Genuine server error markers still terminate the debug session and report the error.
+- R5 adds 45 regression cases (19 model-state and race cases, and 26 completion/error-marker cases). The main suite contains 3,043 cases: 2,859 passed, 184 conditionally skipped, zero failures or errors. The R4, R3 and R2 GUI checks below are historical records and were not rerun with R5.
+- R5 live GUI: a translated Kylin V10 x86_64 container connected to centralized 507 ORA. Stepping through a three-level Package call crossed the server-reported child line 0, returned to the parent and completed normally; another run continued successfully from child line 0. Resume and stepping were disabled during transaction completion. An independent connection read one row after commit, then still one after another debug run rolled back.
+- R5 built all 204 product modules. The six production bundles involved in the repair are byte-identical to the GUI acceptance copy.
+
 - R4: The database debug type is offered only in Debug Configurations, avoiding `No tab group defined` when creating an entry in Run Configurations. The generic Run Configurations menu remains available for other launch types; ordinary SQL runs in the SQL editor.
 - R4: A single click selects a breakpoint; double-click to open source at its line. Switching view tabs does not automatically open source.
 - R4: Initial or slow source loading completes before breakpoint-line positioning. Double-clicking a breakpoint also returns an existing object editor from Properties to Source while preserving unsaved source changes.
-- R4 adds 29 regression cases. The main suite contains 2,998 cases: 2,814 passed, 184 conditionally skipped, zero failures or errors.
+- Historical R4 regression: 29 cases were added; the main suite contained 2,998 cases, with 2,814 passed, 184 conditionally skipped, zero failures or errors.
 - R4 built all 204 product modules; the extracted archive passed manifest verification for 1,202 entries. Live GUI checks cover selection without opening, double-click and Go to File navigation, Properties-to-Source routing, an eight-second loading delay and no reopening after close. An actual Package debug launch aligns the paused line, caret and execution annotation, then completes with rollback.
 - R3: Repeating Package member debugging requests a new acknowledgement for its transaction-scoped setting. An otherwise valid configuration can launch with the checkbox unchecked and ask for confirmation then; declining cancels the launch.
 - R3: Closing a source tab or switching views invalidates pending source lookup, preventing outdated callbacks from reopening tabs or taking focus back.
