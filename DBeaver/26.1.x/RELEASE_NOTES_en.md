@@ -12,12 +12,12 @@ Release tag: `dbeaver-gaussdb-26.1.5-kylin-20261105-r3`. This release provides K
 | `dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.tar.gz` | Linux ARM64 client with Java 21 |
 | Architecture-specific `*.PRODUCT-MANIFEST.json` | Application file, permission, and link inventory |
 | `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz` | Complete enhanced source, matching dbeaver-common, and source inventory |
-| `GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx` | V1.10 connection, debugging, and Package manual (Chinese) |
+| `GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx` | V1.11 connection, debugging, and Package manual (Chinese) |
 | `SHA256SUMS` | Expected digests for the release assets |
 
 See the [guide](./README_en.md#3-download-and-integrity-verification) for downloads and architecture selection. Use the final [Release SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/SHA256SUMS) for integrity checks. Select the explicitly named `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz` for enhanced DBeaver source; GitHub's default Source code links archive the ecosystem documentation tree.
 
-The Word manual is updated to V1.10 with R3 download links and illustrated partition instructions. Online steps and complete-window screenshots for both architectures are in [section 8 of the online guide](./README_en.md#8-inspect-partitions-and-subpartitions).
+The V1.11 Word manual includes current full-window instructions for the unified connection entry, driver configuration, M options, debugging, Packages and partitions. Online steps and complete-window screenshots for both architectures are in [section 8 of the online guide](./README_en.md#8-inspect-partitions-and-subpartitions).
 
 ## Fixes
 
@@ -39,7 +39,7 @@ Java functional revision: `83c09896ee825b0b10c2462ef10001733128d087`. Complete d
 - Both clients passed first-level expansion, Subpartitions page and boundaries, and leaf-folder hiding. With the same connection and cached children, adding a subpartition and pressing F5 changed the tree and list from 2 to 3; dropping it and pressing F5 restored 2.
 - All 451 identically named shared JARs match byte for byte. Both archives were freshly extracted and passed their 1,202-entry application inventories.
 
-Historical connection, debugging, cursor, composite-argument, and Package results retain their original build dates in [section 9 of the guide](./README_en.md#9-validation-results). They do not establish that all historical scenarios were rerun in this round or on ARM.
+See [section 9 of the guide](./README_en.md#9-validation-results) for this release's actual checks and x86_64/ARM64 comparison. Complete connection, debugging, transaction and Package acceptance in the target environment.
 
 ## Boundaries
 

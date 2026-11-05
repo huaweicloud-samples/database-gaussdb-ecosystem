@@ -12,12 +12,12 @@
 | `dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.tar.gz` | Linux ARM64 成品客户端，内置 Java 21 |
 | 对应架构的 `*.PRODUCT-MANIFEST.json` | 包内文件、权限与链接清单 |
 | `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz` | 完整增强源码、匹配的 dbeaver-common、JDK/SWT/Equinox 对应源码及清单 |
-| `GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx` | V1.10 连接、调试及 Package 操作手册（中文） |
+| `GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx` | V1.11 连接、调试及 Package 操作手册（中文） |
 | `SHA256SUMS` | 本次发布文件的预期校验值 |
 
 下载入口及架构选择见[使用指南](./README.md#3-下载与完整性校验)。最终摘要以 [Release 的 SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/SHA256SUMS) 为准。增强源码应选择明确命名的 `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz`；GitHub 默认 Source code 链接对应生态仓自身文档树。
 
-Word 本轮更新至 V1.10，共 45 页、26 张图，修正 R3 下载地址并补充分区操作图示。在线分区操作说明及两种架构完整截图见[在线使用指南第 8 节](./README.md#8-查看分区表和子分区)。
+Word 操作手册为 V1.11，包含当前统一连接入口、驱动配置、M 选项、调试、Package 和分区操作的完整窗口图示。在线分区操作说明及两种架构完整截图见[在线使用指南第 8 节](./README.md#8-查看分区表和子分区)。
 
 ## 本次修复
 
@@ -40,7 +40,7 @@ Word 本轮更新至 V1.10，共 45 页、26 张图，修正 R3 下载地址并�
 - 两边均通过一级分区展开、子分区页与边界展示、叶子节点隐藏空入口；保持同一连接及缓存后，新增子分区并 F5，树和列表从 2 项变 3 项，删除后 F5 恢复 2 项。
 - 451 个同名共享 JAR 字节一致；两份归档分别重新解压并完成 1202 项应用清单校验。
 
-此前版本的连接、调试、游标、复合对象及 Package 验证按原构建记录保留在[使用指南第 9 节](./README.md#9-验证结果)，不代表所有历史场景已在本次或 ARM 上重跑。
+本版的实际检查范围及 x86_64/ARM64 对照结果见[使用指南第 9 节](./README.md#9-验证结果)。目标环境仍须完成连接、调试、事务和 Package 验收。
 
 ## 使用边界
 
