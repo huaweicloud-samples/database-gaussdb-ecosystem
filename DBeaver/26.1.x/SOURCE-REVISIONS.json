@@ -1,0 +1,18 @@
+{
+  "delivery_revision": "20261105-r2",
+  "application_build": "26.1.5.20261105r1",
+  "java_build_source_commit": "3f3bf7ed186ee3edb7c86673a65ebf7e49bc2ecb",
+  "components": {
+    "dbeaver": {
+      "origin": "https://github.com/jarrenL/dbeaver",
+      "commit": "e6382732e5fdcba34ecea6099870960b1b3d0b0a",
+      "tag": "gaussdb-2615-x86_64-beta-20261105-r2",
+      "upstream_origin": "https://github.com/dbeaver/dbeaver",
+      "upstream_base_commit": "4cd7a4a1e61196b992c1f99f3e615ea8056c7a06"
+    },
+    "dbeaver-common": {
+      "origin": "https://github.com/dbeaver/dbeaver-common",
+      "commit": "2df03e58480c6325732f476e8355e375cec5405e"
+    }
+  }
+}
