@@ -25,7 +25,7 @@ Source baselines:
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
 - [Illustrated GUI operation manual (Chinese)](./GAUSSDB_GUI_OPERATION_MANUAL.md)
-- [Detailed V1.9 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
+- [Detailed V1.9 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 - [Source components and revisions](./SOURCE-REVISIONS.json)
 
 ## 2. Scope
@@ -50,7 +50,7 @@ This ecosystem release provides the Kylin V10 x86_64 client archive, product man
 - [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json)
 - [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/SHA256SUMS)
 - [Complete enhanced source, including matching dbeaver-common](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz)
-- [V1.9 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
+- [V1.9 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 
 The default **Source code (zip/tar.gz)** links on the GitHub Release page archive the ecosystem documentation repository. For this enhanced DBeaver source, download the explicitly named `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz` above. It contains complete `dbeaver/` and matching `dbeaver-common/` trees plus a file-hash `SOURCE-MANIFEST.json`.
 
@@ -68,6 +68,8 @@ uname -m
 ```
 
 `uname -m` must report `x86_64`, and the digest must match the value above. This package cannot run on ARM64/aarch64 systems.
+
+The standalone Word asset uses an ASCII filename for download compatibility; its content is Chinese. The client archive retains the Chinese manual filename.
 
 ## 4. Installation and startup
 
