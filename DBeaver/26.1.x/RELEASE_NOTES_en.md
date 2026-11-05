@@ -13,7 +13,7 @@ This delivery includes the Kylin V10 x86_64 client, product manifest, complete e
 | `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz` | Client archive | `e35365c5c3af67ab8a73e63b7aaf73287b09df60caf82d7526e2ba079730c8c5` |
 | `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json` | Package file manifest | `ec5727fd83c39d0dff7200f794e20a50c6b88ea91fda2a1c9119e51d4ecbb90d` |
 | `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz` | Enhanced source, matching dbeaver-common, and internal hash manifest | `8ea7e6e10dfba5e7291a4b6983792747a2bacd9e99fa7abf93c99bea45d4ce9f` |
-| `GaussDB_DBeaver_调试与Package操作手册_20261105.docx` | V1.9 connection, debugging, and Package operation manual | `9341e530517a9a6eb2cefa01b0db257fa2e7782be7e8347089919727fb2f0780` |
+| `GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx` | V1.9 connection, debugging, and Package operation manual | `9341e530517a9a6eb2cefa01b0db257fa2e7782be7e8347089919727fb2f0780` |
 | `SHA256SUMS` | Checksum entry point for the four payload files above | Generated and read back during publication |
 
 ## Highlights

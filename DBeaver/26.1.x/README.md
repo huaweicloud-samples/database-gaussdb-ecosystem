@@ -25,7 +25,7 @@
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
 - [图形界面操作手册（在线阅读，含截图）](./GAUSSDB_GUI_OPERATION_MANUAL.md)
-- [详细操作手册 V1.9（Word，直接下载）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
+- [详细操作手册 V1.9（Word，直接下载）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 - [源码组件与修订记录](./SOURCE-REVISIONS.json)
 
 ## 2. 适用范围
@@ -50,7 +50,9 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 - [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json)
 - [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/SHA256SUMS)
 - [完整增强源码（含匹配的 dbeaver-common）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz)
-- [连接与调试操作手册 V1.9（Word）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
+- [连接与调试操作手册 V1.9（Word）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+
+独立 Word 附件采用英文文件名以兼容下载平台，正文仍为中文；安装包内保留中文手册文件名。
 
 普通安装使用客户端下载和 Word 手册即可；需要自行编译或审阅实现时再下载完整增强源码。
 
