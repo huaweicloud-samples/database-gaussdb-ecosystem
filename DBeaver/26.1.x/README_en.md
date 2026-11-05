@@ -21,7 +21,7 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 Source baselines:
 
 - [Complete enhanced source in this ecosystem release](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
-- Java functional revision: `5337454d1e9678c7956c30a8b11ac71412ee5a97`; see [SOURCE-REVISIONS.json](./SOURCE-REVISIONS.json) for the complete delivered-source revision.
+- Java functional revision: `83c09896ee825b0b10c2462ef10001733128d087`; see [SOURCE-REVISIONS.json](./SOURCE-REVISIONS.json) for the complete delivered-source revision.
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -111,17 +111,17 @@ After the main window closes, background processes may need several seconds to s
 Complete the connection before starting routine or Package debugging. See the [online illustrated manual](./GAUSSDB_GUI_OPERATION_MANUAL.md) for full-window screenshots and annotations, or download the Word manual for offline use.
 
 1. Obtain the reachable server host, port, database name, account, and compatibility mode from the database administrator. The host is a database endpoint, not the client extraction directory.
-2. Open **Database → New Database Connection**, or the new-connection toolbar action, and select GaussDB Native for O/Oracle mode. Add the matching JDBC JAR as described below.
-3. Enter the connection details, run **Test Connection**, and finish the wizard. Confirm that the connection expands in **Database Navigator**.
+2. Open **Database → New Database Connection**, or the new-connection toolbar action, and select the single **GaussDB** entry for both O/A/ORA and M databases. Add the matching JDBC JAR as described below.
+3. Enter the connection details. For M databases, select **M compatibility: mCompatible=true, yearIsDateType=true**; leave it cleared for A/O databases. This sets JDBC properties for this connection and does not change the database compatibility mode. Run **Test Connection**, finish the wizard, and confirm that the connection expands in **Database Navigator**.
 4. Expand the database and schema, check the tables and supported routines or packages, then follow sections 6 and 7 for debugging and compilation.
 
 
 The distribution does not bundle a GaussDB JDBC driver. Use an organization-approved driver that matches the target database version:
 
 1. Start DBeaver and select **Database** > **Driver Manager**.
-2. For O/Oracle mode, select **GaussDB Native** and choose **Edit**, or use **Edit Driver Settings** in the new-connection wizard.
+2. Select **GaussDB** and choose **Edit**, or use **Edit Driver Settings** in the new-connection wizard.
 3. Add the GaussDB JDBC JAR on the **Libraries** page.
-4. Confirm `com.huawei.gaussdb.jdbc.Driver` and the `jdbc:gaussdb:` protocol. Do not mix PostgreSQL jars or conflicting driver versions into this definition.
+4. The default configuration for commonly used `gsjdbc4.jar` is `org.postgresql.Driver` with `jdbc:postgresql:`. If the official JAR actually provides `com.huawei.gaussdb.jdbc.Driver`, configure it with `jdbc:gaussdb:` in the driver editor. Match the actual class and protocol; do not infer them from the filename or require a different JAR solely because the database is in O mode. Avoid conflicting driver versions.
 5. Create a connection and enter the host, port, database, user, and password.
 6. Run **Test Connection** and finish the wizard after it succeeds. Use SQL to query `version()`, `current_database()`, `current_user`, and `pg_settings.sql_compatibility` to confirm the actual target; the success dialog does not replace these queries.
 
@@ -129,11 +129,11 @@ The client does not silently alter private session parameters. If a server capab
 
 Built-in GaussDB drivers disable “Thread safe driver” by default, serializing statements and result reading on each connection to avoid driver concurrency failures during multi-schema refresh. Separate connections remain parallel. If an old workspace or custom driver explicitly enables this option, disable it in Database → Driver Manager → Edit and reconnect. This is a client setting and does not alter database session parameters.
 
-R3 hides the legacy GaussDB entry in the new-connection picker while retaining existing connection definitions. The M-specific and native configurations remain available. The native entry requires `com.huawei.gaussdb.jdbc.Driver` and `jdbc:gaussdb:`; the JAR filename alone does not establish compatibility. A local native-driver JDBC check against GaussDB 507 M passed connection, temporary-table DDL, bound Unicode/SQL NULL and rollback. This is not acceptance of every driver version or M data type. A legacy gsjdbc4 exposing only `org.postgresql.Driver` needs its matching configuration.
+R3 exposes one **GaussDB** entry in the new-connection picker. The three previous driver definitions remain internally available for saved connections, and Driver Manager can still edit their configuration. The unified entry was tested with a matching `gsjdbc4.jar` on both architectures: real GaussDB 507 A/M connections, detected modes and saved/reopened M options passed. Separate JDBC checks covered temporary-table DDL, bound Unicode/SQL NULL and rollback. This does not establish acceptance of every driver version or M data type.
 
-The new-connection picker after hiding the legacy entry:
+The unified new-connection picker, with legacy definitions retained for saved connections:
 
-![Only the M and native presets appear](./imgs/new-connection-two-drivers.png)
+![The new-connection picker shows one GaussDB entry](./imgs/new-connection-gaussdb.png)
 
 ## 6. Debug a stored procedure or function
 
@@ -259,13 +259,15 @@ The same operation in the Kylin V10 ARM64 container:
 - Restore partition properties in the table editor and display actual, correctly quoted column names. Read a partition's own boundary separately from its subpartition strategy; automatic INTERVAL partitions use range-boundary notation.
 - Restore the subpartition tree and editor entry that was lost when the PostgreSQL navigator tree was inherited. The explicit physical-subpartition node is registered for GaussDB; PostgreSQL's original navigator remains unchanged.
 - Refresh physical partitions from `pg_partition`, replace stale objects and update the parent cache, instead of treating partition OIDs as `pg_class` table OIDs.
-- Main OSGi JUnit regression: **3,159 cases; 2,975 passed, 184 conditionally skipped, zero failures or errors**. Fifteen partition-property, registered-tree, two-level metadata and refresh cases were added. The complete suite ran on the build host; it was not rerun in full on ARM.
+- Main OSGi JUnit regression: **3,197 cases; 3,013 passed, 184 conditionally skipped, zero failures or errors**. Sixty partition, driver-visibility, saved-connection and JDBC-option cases were added. The complete suite ran on the build host; it was not rerun in full on ARM.
 - All 43 packaging-script checks passed and all 204 product modules built successfully. Both archives were freshly extracted and passed their 1,202-entry application manifests.
 - Both real GUIs ran in Kylin Linux Advanced Server V10 (Lance) containers against the same centralized GaussDB 507 ORA database. The x86_64 user space used host instruction translation; ARM64 used native ARM64 user space. Both containers share the host LinuxKit kernel.
 
 | Client check in this round | x86_64 | ARM64 |
 | --- | --- | --- |
 | Startup and database connection | Passed | Passed |
+| One GaussDB picker entry, real A/M connections and M capability gates | Passed | Passed |
+| Saved/reopened M option, URL-conflict validation, driver class and JDBC properties | Passed | Passed |
 | Seven-table matrix: RANGE, LIST, HASH, INTERVAL, quoted column name, ordinary table, two-level partition table | Passed | Passed |
 | First-level expansion, Subpartitions entry, editor list and boundaries | Passed | Passed |
 | Leaf hides an empty next-level entry | Passed | Passed |
@@ -356,3 +358,5 @@ The command builds the Java/Eclipse product. Recreating the Kylin archive additi
 ## 12. Licensing
 
 DBeaver Community source and these enhancements are provided under the applicable Apache License 2.0 terms. Bundled third-party components remain under their respective licenses; third-party source and license information is included in the package.
+
+For the unified entry, omit `mCompatible` and `yearIsDateType` from URL query strings. The connection page rejects these conflicting URL parameters; use the explicit M option or the Driver properties page.

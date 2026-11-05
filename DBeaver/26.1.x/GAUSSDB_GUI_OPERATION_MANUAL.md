@@ -70,7 +70,7 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 
 本节从尚未创建连接的客户端开始。先准备 DBA 提供的数据库主机地址、端口、数据库名、数据库用户名和密码、兼容模式，以及匹配的官方 JDBC jar；若要求 SSL/TLS，还需准备指定的连接方式和证书。连接服务器前，麒麟桌面必须能访问该地址与端口。数据库名、schema 名和桌面云登录账号是不同概念，不可互相代填。
 
-R3 新建连接列表保留 **GaussDB M** 和 **GaussDB 原生驱动**，旧的 **GaussDB** 入口隐藏；已有连接仍能按原驱动使用。部分历史截图仍显示旧入口。原生驱动要求 JAR 包含 `com.huawei.gaussdb.jdbc.Driver`，并使用 `jdbc:gaussdb:`；仅包含 `org.postgresql.Driver` 的旧 `gsjdbc4.jar` 不能直接套用原生配置；连接 M 库时应选择 M 专用项并使用匹配参数。文件名本身不能判断 JAR 是否包含原生驱动类。
+R3 新建连接列表只有一个 **GaussDB** 入口，供 O/A/ORA 与 M 兼容库使用。旧的三个驱动定义从新建列表隐藏，但仍保留供已有连接加载，无需删除重建。默认常用 `gsjdbc4.jar` 使用 `org.postgresql.Driver` 与 `jdbc:postgresql:`；若官方 JAR 实际提供 `com.huawei.gaussdb.jdbc.Driver`，可在驱动管理器中配套使用 `jdbc:gaussdb:`。按 JAR 实际类名选择协议，不凭文件名判断，也不因 O 模式而强制更换驱动包。连接 M 库时显式勾选 **M 兼容库：mCompatible=true、yearIsDateType=true**；O/A/ORA 库不勾。此选项只设置本连接的 JDBC 参数，不修改数据库兼容模式。 URL 模式请勿在查询串中重复填写 `mCompatible` 或 `yearIsDateType`；页面会提示移除冲突项，以保证勾选设置与实际生效值一致。
 
 连接图 C01～C09 来自通过转译运行的麒麟 V10 x86_64 容器，实际连接 GaussDB 507 O/Oracle 兼容演示库。截图用于说明控件位置；`host.docker.internal:55452`、`dbv_connect_20261105` 和 `manual_demo` 是演示环境信息，请替换为 DBA 提供的实际地址、数据库、账号和 schema。
 
@@ -82,11 +82,11 @@ R3 新建连接列表保留 **GaussDB M** 和 **GaussDB 原生驱动**，旧的 
 
 连接图 C01：打开顶部“数据库”菜单，选择“新建数据库连接”。也可使用界面显示的快捷键 Shift+Ctrl+N。
 
-2. 在驱动选择页搜索 `GaussDB`，O/Oracle 兼容库选择 **GaussDB 原生驱动（GaussDB Native）**，再点“下一步”。不要选择 PostgreSQL 或 Generic 代替本手册的专用驱动；GaussDB M 条目用于 M 兼容库，不用于本节的 O 模式 PL/SQL 调试。
+2. 在驱动选择页搜索 `GaussDB`，选择唯一的 **GaussDB** 入口，再点“下一步”。O/Oracle 和 M 兼容库都从此入口创建连接；不要选 PostgreSQL 或 Generic 代替 GaussDB 专用功能。
 
 ![连接操作图示](./imgs/connection-driver.png)
 
-连接图 C02：按名称选择“GaussDB 原生驱动（GaussDB Native）”，再点右下“下一步”。排序可能变化，不按第几个图标判断，也不把 M 兼容条目作为本节入口。
+连接图 C02：新版新建连接列表只有一个 GaussDB 入口；图中三个图标属于历史界面，不按图中位置选择。旧驱动定义仍保留供已有连接使用，无需删除重建。
 
 3. 驱动条目不会改变服务器已有数据库的兼容模式。目标库实际是否为 O/Oracle 模式，仍须在连接后查询确认。
 
@@ -94,24 +94,24 @@ R3 新建连接列表保留 **GaussDB M** 和 **GaussDB 原生驱动**，旧的 
 
 1. 将供应商或 DBA 提供的匹配 JDBC jar 复制到**当前麒麟桌面能够读取的本地目录**。文件选择框读取的是运行 DBeaver 的桌面文件系统，不是 GaussDB 服务器目录。
 2. 在连接设置页右下方点击 **编辑驱动设置**，进入驱动编辑器顶部的 **库/Libraries** 页。若内网弹出在线下载提示，先取消在线下载，按本节添加本地文件。
-3. 先检查库列表。GaussDB Native 不应混入 PostgreSQL 驱动 jar；同一驱动类的多个旧版本 jar 也可能导致加载错误版本。确认后，仅移除本驱动库列表中的冲突项或重复旧版，保留供应商明确要求的依赖。不要删除整个驱动定义或随意删除其他驱动的文件。
+3. 先检查库列表。使用供应商提供的匹配 GaussDB JDBC jar，不混用多个冲突版本。同一个官方 gsjdbc4 包可以服务其支持的 A/O 和 M 库。仅移除本驱动库列表中的冲突项或重复旧版，保留供应商明确要求的依赖，不删除整个驱动定义或其他驱动文件。
 4. 点击 **添加文件/Add File**，选中已准备的官方 GaussDB JDBC jar，确认后检查列表中出现了该文件。路径必须在后续启动时仍存在；不要把 jar 留在会自动清理的临时目录。
 
 ![连接操作图示](./imgs/connection-driver-libraries.png)
 
 连接图 C03a：在“库”页使用右侧“添加文件”。左侧最终显示已添加的 gaussdbjdbc.jar；图中的本地目录仅为示例，客户使用自己保存官方 jar 的稳定目录。
 
-5. 检查驱动类和 URL 协议。GaussDB Native 对应 `com.huawei.gaussdb.jdbc.Driver` 和 `jdbc:gaussdb:`。不能只把 PostgreSQL jar 的显示名称改成 GaussDB 来代替。确认驱动设置后返回连接主页。
+5. 检查驱动类和 URL 协议。默认常用 `gsjdbc4.jar` 使用 `org.postgresql.Driver` 与 `jdbc:postgresql:`。若供应商 jar 实际使用 `com.huawei.gaussdb.jdbc.Driver`，则在高级驱动管理中配 `jdbc:gaussdb:`。按 jar 实际类名与协议配套，不因 O 库而强制换包；确认后返回连接主页。
 
 ![连接操作图示](./imgs/connection-driver-settings.png)
 
-连接图 C03b：切换顶部“设置”页，核对“类名”为 com.huawei.gaussdb.jdbc.Driver，URL 模板使用 jdbc:gaussdb:。默认端口不代表客户数据库的实际端口。
+连接图 C03b：此历史截图展示 `com.huawei.gaussdb.jdbc.Driver` 与 `jdbc:gaussdb:` 的配套配置。新版默认 gsjdbc4 对应 `org.postgresql.Driver` 与 `jdbc:postgresql:`，不要只照抄图中类名；端口也以 DBA 提供值为准。
 
 驱动定义可能由多个已有连接共用。已有正常连接时，修改前记录其库列表和使用范围；需要并行使用不同版本时，为连接准备独立的驱动定义后再调整，不直接替换所有连接共用的 jar。
 
 #### T01.3 填写连接字段及密码保存选项
 
-在“主要”页选择“主机”连接方式，再逐项填写 DBA 提供的信息；上方灰色 URL 随字段自动生成。截图中的地址、端口、数据库名和用户名只用于演示，客户环境应填写自己的实际值。
+在“主要”页选择“主机”，填写 DBA 提供的信息；URL 随字段自动生成。O/A/ORA 库不勾 **M 兼容库**；M 库勾选后显式启用 `mCompatible=true`、`yearIsDateType=true`。这是本连接的 JDBC 参数，不会修改数据库模式。截图中的地址、端口、库名和用户仅为演示，使用自己的实际值。
 
 | 字段 | 填写方法 |
 | --- | --- |
@@ -187,7 +187,7 @@ SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
 
 | 现象 | 先检查什么 |
 | --- | --- |
-| 找不到驱动类、Driver class not found | 是否选择 GaussDB Native；库列表中的 jar 是否存在、可读、匹配驱动类；是否混入其他驱动或多个冲突版本 |
+| 找不到驱动类、Driver class not found | 是否选择 GaussDB；jar 是否存在、可读；实际驱动类与 URL 协议是否配套；是否混入多个冲突版本 |
 | 连接被拒绝、超时、无法解析主机 | 主机、数据库端口、桌面到数据库的网络路径、DNS 和服务入口是否正确；请 DBA 或网络维护人员核对服务及访问规则 |
 | 用户名或密码错误、认证失败 | 数据库账号、密码、数据库名及服务器允许的认证方式；不要用授予超级用户或关闭认证替代排查 |
 | SSL、证书或主机名校验错误 | DBA 要求的 SSL 模式、证书文件、证书有效期和连接主机名是否匹配；保留原文，不直接关闭证书校验 |
@@ -204,7 +204,7 @@ SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
 
 ### T02：M 模式基础能力
 
-另建连接指向 DBA 提供的 M 库，使用匹配的 GaussDB M 驱动配置。不要更改原 O 库。
+另从统一 **GaussDB** 入口新建连接，指向 DBA 提供的 M 库并勾选 **M 兼容库：mCompatible=true、yearIsDateType=true**。按官方 jar 实际类名配协议；同包可用于其支持的 A/O 与 M 库。此项只设置本连接的 JDBC 参数，不更改数据库模式。不要更改原 O 库。
 
 1. 展开 schema、表、字段；双击测试表，查看“属性”和“数据”。
 2. 在独立测试 schema 中创建普通表，插入、查询、修改、删除一条测试记录。逐条执行，并明确提交事务。

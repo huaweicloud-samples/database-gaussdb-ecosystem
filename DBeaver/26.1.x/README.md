@@ -21,7 +21,7 @@
 源码基线：
 
 - [本次完整增强源码（生态仓 Release 附件）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
-- 本轮 Java 功能修订：`5337454d1e9678c7956c30a8b11ac71412ee5a97`；完整交付源码修订见 [SOURCE-REVISIONS.json](./SOURCE-REVISIONS.json)。
+- 本轮 Java 功能修订：`83c09896ee825b0b10c2462ef10001733128d087`；完整交付源码修订见 [SOURCE-REVISIONS.json](./SOURCE-REVISIONS.json)。
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
@@ -111,29 +111,41 @@ chmod +x dbeaver
 先按以下顺序完成连接，再进入存储过程或 Package 调试。详细全窗口截图与逐步标注见[在线操作手册](./GAUSSDB_GUI_OPERATION_MANUAL.md)，也可下载上面的 Word 手册离线查看。
 
 1. 确认数据库管理员提供的主机、端口、数据库名、账号及兼容模式；数据库地址填写服务器可访问地址，而不是本机解压目录。
-2. 通过“数据库 → 新建数据库连接”或工具栏“新建连接”进入向导，选择 GaussDB 驱动；按以下步骤添加与目标库版本匹配的 JDBC JAR。
-3. 填写连接参数，执行“测试连接”。成功后完成向导，在左侧“数据库导航器”确认连接可展开。
+2. 通过“数据库 → 新建数据库连接”或工具栏“新建连接”进入向导，选择唯一的 **GaussDB** 入口；O/A/ORA 与 M 库都使用此入口。按以下步骤添加与目标库版本匹配的 JDBC JAR。
+3. 填写连接参数；M 库勾选 **M 兼容库：mCompatible=true、yearIsDateType=true**，A/O 库不勾。此项只设置本连接的 JDBC 参数，不修改数据库兼容模式。 URL 模式请勿在查询串中重复填写 `mCompatible` 或 `yearIsDateType`；页面会提示移除冲突项，以保证勾选设置与实际生效值一致。执行“测试连接”，成功后完成向导，确认左侧“数据库导航器”可展开。
 4. 展开目标数据库与 Schema，确认可以看到表及受支持的存储过程／函数／包；再按第 6、7 节配置调试和编译。
 
 
 发布包不内置 GaussDB JDBC 驱动。请使用与目标数据库版本匹配、经过组织审批的驱动：
 
 1. 启动 DBeaver，选择“数据库”→“驱动管理器”。
-2. O/Oracle 模式选择 **GaussDB 原生驱动（GaussDB Native）**，点击“编辑”；也可在新建连接向导里点击“编辑驱动设置”。
+2. 选择 **GaussDB**，点击“编辑”；也可在新建连接向导里点击“编辑驱动设置”。
 3. 在“库”页添加 GaussDB JDBC JAR。
-4. 确认原生驱动类为 `com.huawei.gaussdb.jdbc.Driver`，URL 协议为 `jdbc:gaussdb:`；不要混入 PostgreSQL jar 或多个冲突版本。
+4. 默认常用 `gsjdbc4.jar` 对应 `org.postgresql.Driver` 与 `jdbc:postgresql:`；若官方 JAR 实际使用 `com.huawei.gaussdb.jdbc.Driver`，在驱动编辑页配套设置 `jdbc:gaussdb:`。按 JAR 的实际类名与协议配套，不凭文件名判断，也不因 O 模式强制换包；不要混入多个冲突版本。
 5. 保存后新建连接，填写主机、端口、数据库、用户名和密码。
 6. 点击“测试连接”，成功后完成向导。再在 SQL 编辑器查询 `version()`、`current_database()`、`current_user` 和 `pg_settings.sql_compatibility`，确认真实目标；测试成功框不代替这些查询。
 
-R3 在新建连接列表隐藏旧的 GaussDB 入口，保留 M 专用和原生驱动配置；旧连接仍按原定义加载。原生入口按 `com.huawei.gaussdb.jdbc.Driver` 和 `jdbc:gaussdb:` 配置，不以 JAR 文件名判断兼容性。本地原生驱动连接 GaussDB 507 M 的 JDBC 基础连接、临时表、中文及 SQL NULL 绑定和回滚已通过；该检查不代表所有驱动版本或全部 M 模式数据类型都已验收。仅提供 `org.postgresql.Driver` 的旧 gsjdbc4 应使用对应专用配置。
+R3 新建连接列表统一为一个 **GaussDB** 入口；旧三个驱动定义仍在内部保留，已保存连接按原定义加载，驱动管理器仍可调整配置。本轮统一入口使用匹配的 `gsjdbc4.jar`，在两种架构上完成 GaussDB 507 A/M 真实连接、模式识别、M 参数保存与重新打开；另完成临时表、中文及 SQL NULL 绑定和回滚的 JDBC 验证。此结果不代表全部驱动版本或 M 数据类型均已验收。
 
 客户端不会在后台静默修改会话级私有参数。若特定服务端能力要求额外参数，能力检查或错误信息会明确提示，由用户或数据库管理员确认后显式设置。
 
 GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的语句和结果读取互斥，避免多 Schema 并发刷新触发驱动内部异常；不同连接仍可并行。旧工作区或自定义驱动若显式启用了此选项，请在“数据库 → 驱动管理器 → 编辑驱动”中取消后重新连接。这是客户端选项，不修改数据库会话参数。
 
-新版新建连接列表（旧入口已隐藏）：
+新版新建连接列表（统一 GaussDB 入口，旧连接定义保留）：
 
-![新建连接仅显示 M 与原生驱动](./imgs/new-connection-two-drivers.png)
+![新建连接只显示一个 GaussDB 入口](./imgs/new-connection-gaussdb.png)
+
+在连接向导的“主要”页选择 M 兼容选项；A/O 库不勾选：
+
+![连接页显式 M 兼容 JDBC 选项](./imgs/connection-m-options.png)
+
+点击右下角“编辑驱动设置”查看或修改驱动类；主机模式下 JDBC 协议由实际驱动类生成，返回连接页核对实际 URL：
+
+![驱动类与 URL 模板](./imgs/connection-driver-class.png)
+
+当前连接的 JDBC 参数位于“驱动属性”页，图中 `mCompatible=true` 对应已勾选的 M 选项：
+
+![当前连接的 JDBC 驱动属性](./imgs/connection-driver-properties.png)
 
 ## 6. 调试存储过程或函数
 
@@ -259,13 +271,15 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 - 修复表结构页丢失分区属性的问题，展示真实列名组成的分区依据；一级边界与二级分区策略分别读取，INTERVAL 自动分区使用范围边界形式显示。
 - 修复继承导航树后丢失二级分区入口的问题；只为 GaussDB 显式注册物理子分区节点，保留 PostgreSQL 原有导航配置。
 - 修复刷新后保留旧子分区缓存的问题；刷新从 `pg_partition` 读取新对象并更新父节点缓存，不再把分区 OID 当作 `pg_class` 表 OID 查询。
-- 主工程 OSGi JUnit 回归共 **3159 项：2975 通过、184 按条件跳过、0 失败、0 错误**；新增 15 项分区回归及 7 项驱动入口和旧连接兼容回归。该完整回归运行于构建机，未宣称全部在 ARM 上重跑。
+- 主工程 OSGi JUnit 回归共 **3197 项：3013 通过、184 按条件跳过、0 失败、0 错误**；新增 15 项分区、7 项驱动入口及旧连接兼容、37 项连接参数校验，以及 1 项统一入口执行上下文回归。该完整回归运行于构建机，未宣称全部在 ARM 上重跑。
 - 43 项打包脚本检查通过，204 个产品构建模块成功；两个架构的归档分别完成重新解压和 1202 项应用文件清单核对。
 - 两种架构均在麒麟 Linux Advanced Server V10（Lance）容器中运行真实图形客户端，连接同一 GaussDB 507 集中式 ORA 库。x86_64 用户态通过宿主机指令转译运行，ARM64 使用原生 ARM64 用户态；两者共享宿主机 LinuxKit 内核。
 
 | 本轮客户端检查 | x86_64 | ARM64 |
 | --- | --- | --- |
 | 启动、数据库连接 | 通过 | 通过 |
+| 新建连接仅一个 GaussDB，A/M 实库连接及 M 功能门控 | 通过 | 通过 |
+| M 复选项保存及重开、URL 参数冲突提示、驱动类和 JDBC 属性页 | 通过 | 通过 |
 | RANGE、LIST、HASH、INTERVAL、带引号列名、普通表及二级分区表，共七表矩阵 | 通过 | 通过 |
 | 一级分区展开、子分区入口、属性页子分区列表与边界 | 通过 | 通过 |
 | 叶子节点隐藏空的下一级入口 | 通过 | 通过 |

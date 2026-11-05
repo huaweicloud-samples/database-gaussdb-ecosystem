@@ -1,19 +1,19 @@
 {
   "delivery_revision": "20261105-r3",
   "application_build": "26.1.5.20261105r3",
-  "java_build_source_commit": "5337454d1e9678c7956c30a8b11ac71412ee5a97",
+  "java_build_source_commit": "83c09896ee825b0b10c2462ef10001733128d087",
   "enhanced_source": {
     "file": "dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz",
     "download_url": "https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz",
-    "sha256": "a4f539537c84020637f354172ce7423d05a9ec6ac14ad90a28d5bfa717f20736",
-    "source_commit": "5337454d1e9678c7956c30a8b11ac71412ee5a97",
-    "manifest_records": 10339,
+    "sha256": "b8c34f4a950ebf53298916a437d474aea218dddf9e8022d673b58de8bd7a2e44",
+    "source_commit": "83c09896ee825b0b10c2462ef10001733128d087",
+    "manifest_records": 10341,
     "omitted_nonbuild_qa_records": 512,
     "includes_matching_native_and_jdk_sources": true
   },
   "components": {
     "dbeaver": {
-      "source_commit": "5337454d1e9678c7956c30a8b11ac71412ee5a97",
+      "source_commit": "83c09896ee825b0b10c2462ef10001733128d087",
       "distribution": "enhanced_source Release asset",
       "upstream_origin": "https://github.com/dbeaver/dbeaver",
       "upstream_base_commit": "4cd7a4a1e61196b992c1f99f3e615ea8056c7a06"
@@ -24,12 +24,12 @@
     }
   },
   "validation": {
-    "junit_total": 3159,
-    "junit_passed": 2975,
+    "junit_total": 3197,
+    "junit_passed": 3013,
     "junit_skipped": 184,
     "junit_failures": 0,
     "junit_errors": 0,
     "junit_scope": "Build-host OSGi regression; not all tests rerun on ARM",
-    "gui_scope": "Kylin V10 x86_64 and aarch64 containers; GaussDB 507 centralized ORA partition smoke comparison"
+    "gui_scope": "Kylin V10 x86_64 and aarch64 containers; GaussDB 507 centralized ORA partition smoke comparison and unified A/M connection acceptance"
   }
 }
