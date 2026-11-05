@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.20261103r6`; updated on 2026-11-03. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.20261105r1`; updated on 2026-11-05. The release tag, archive, product manifest and checksums all identify this build.
 
 ## 1. Overview
 
@@ -19,10 +19,13 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r6)
-- Source revision: `590b4395c1c512257b95248a6d1bd26415f4c644`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r1)
+- Source revision: `3f3bf7ed186ee3edb7c86673a65ebf7e49bc2ecb`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
+
+- [Illustrated GUI operation manual (Chinese)](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GAUSSDB_GUI_OPERATION_MANUAL_20260922.md)
+- [Detailed operation manual (Word, Chinese)](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GaussDB_DBeaver_调试与Package操作手册_20261014.docx)
 
 ## 2. Scope
 
@@ -30,7 +33,7 @@ Source baselines:
 | --- | --- |
 | Client version | DBeaver 26.1.5 GaussDB Enhanced Edition |
 | Client platform | Kylin V10 x86_64 |
-| Validated database | Historical baseline: centralized and distributed GaussDB 505.2.1.SPC0800; this cursor-state enhancement: centralized GaussDB 507 ORA; see section 8 for the validation scope |
+| Validated database | Historical baseline: centralized and distributed GaussDB 505.2.1.SPC0800; this composite-parameter and transaction-message repair: centralized GaussDB 507 ORA; see section 8 for the validation scope |
 | Compatibility modes | Detects ORA/A, MYSQL/B, TD/C, PG, and M; features are enabled according to server capabilities |
 | PL/SQL debugging | Enabled when the server provides the required `DBE_PLDEBUGGER` signatures and the current user has permission |
 | Package management | Full capability is intended for Package-capable centralized ORA deployments; other deployments use capability-based fallback behavior |
@@ -41,21 +44,21 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/SHA256SUMS)
 
 SHA-256:
 
 ```text
-b5e1492025d1c414bb71d69d8bf09aa34297b4d6875472a0ca674213b6df1a7c  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
+e730de0140fc2f262f31a8588452c68204ad88d1706ec2fd806c87207ba47ad1  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
 uname -m
 ```
 
@@ -66,7 +69,7 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -114,6 +117,12 @@ Built-in GaussDB drivers disable “Thread safe driver” by default, serializin
 5. Select the data source and routine, then provide values for all `IN` and `INOUT` parameters.
 6. Choose **Debug**.
 
+Enter composite arguments using the database type's text format, for example `(1,张三)`. Quote a field containing a comma with double quotes, for example `(2,"Alice, Jr.")`; do not wrap the whole input in SQL single quotes. The debugger resolves each parameter's actual type OID and qualifies user-defined type names with their owning schema, including when the routine and type are in different schemas. Built-in numeric and text arguments retain their existing call format.
+
+To pass SQL NULL for the entire parameter, select SQL NULL in the input-mode column rather than supplying a string value. Composite objects still use text input; a field-by-field object editor is not provided.
+
+![Composite argument fields after suspension](./imgs/object-parameter-debug.png)
+
 The generic **Run** > **Run Configurations...** menu remains available for other launch types; the database debug type is offered only in **Debug Configurations**. Execute ordinary SQL in the SQL editor. If an older build reports `No tab group defined` when creating an entry in **Run Configurations**, close that dialog, use the database debug entry above, and update to this build. Do not delete the workspace.
 
 ![Debug source and breakpoint](./imgs/debug-source.png)
@@ -148,7 +157,7 @@ The **Call Stack** view displays nested routine calls. Selecting another frame r
 
 ![Call stack](./imgs/call-stack.png)
 
-At the end of a session, choose whether to commit or roll back data changes produced during debugging. Rollback is the safer default in shared or production-like environments.
+The completion dialog defaults to Rollback and applies only to the remaining open transaction on the target connection. A `COMMIT` already executed inside the routine cannot be undone by this final rollback; the choice applies to later changes that remain uncommitted. Commit/Rollback handles database data and does not save editor source. Save and compile source changes in the object editor before debugging.
 
 ![Debug transaction choice](./imgs/debug-transaction-choice.png)
 
@@ -167,6 +176,12 @@ The **Breakpoints** view retains configured breakpoints for the entire workspace
 Breakpoint labels include the connection identity, including when a custom label is used. Toggling a breakpoint at the same source line removes all matching duplicate records while preserving other connections. The client does not clear historical breakpoints automatically. Select unused breakpoints in the **Breakpoints** view to remove them, or uncheck them to disable them.
 
 In **Breakpoints**, a single click selects a breakpoint; double-click to open its source and navigate to the breakpoint line. Merely switching to the Breakpoints or another view tab does not open source automatically. On initial or slow loading, execution-line and instruction-pointer positioning waits until the source document has loaded. After a source tab is closed or another view is selected, outdated asynchronous source results are ignored so the tab is not reopened and focus is not taken back.
+
+### 6.6 Edit and save a stored procedure
+
+Finish the current debug session and resolve the remaining transaction first. In Database Navigator, expand **connection → database → schema → target schema → Procedures**, double-click the routine, then select **Properties → Source**. Edit the complete `CREATE OR REPLACE` definition, press **Ctrl+S**, review the save SQL and confirm. Start a new debug session after saving; suspended code cannot be hot-replaced.
+
+![Normal source editor: red boxes mark the routine and Source](./imgs/routine-source-entry.png)
 
 ## 7. Package compilation and error navigation
 
@@ -189,6 +204,16 @@ Multiple Packages can be selected in Database Navigator for batch deletion. The 
 If a distributed server does not support forced invalid Package bodies or compilation diagnostic views, the client displays the direct server error and does not report compile-error navigation as successful.
 
 ## 8. Validation results
+
+Validation of the 2026-11-05 R1 build:
+
+- Fix cross-schema composite argument calls by resolving the parameter's actual type OID and qualifying its owning schema. User-defined types no longer depend on the current search path; built-in type formatting is preserved.
+- The completion dialog explains that only the remaining transaction is affected, prior commits inside the routine cannot be rolled back, and source code is not saved. Rollback remains the default.
+- Main regression: 3,137 cases, with 2,953 passed, 184 conditionally skipped, zero failures or errors; seven regression cases were added since R6. All 204 product build modules succeeded. Fresh extraction passed all 1202 inventory entries, and 6 key production plugins byte-match the tested GUI copy.
+- Centralized 507 ORA GUI checks: a Kylin V10 x86_64 container running through Rosetta/instruction translation and sharing the LinuxKit kernel debugged `(1,张三)` and `(2,"Alice, Jr.")`, paused, and displayed their fields correctly. After an actual commit, an independent connection read back the expected input values.
+- SQL NULL and internal-COMMIT verification: A whole-object SQL NULL argument launched and completed successfully; an independent connection confirmed one committed row for each composite example and one SQL NULL row. On 507, `info_locals()` can display NULL composite fields as `0/<UNKNOWN>`; these placeholders are not claimed as exact field values. The internal-COMMIT scenario inserted 901 and committed, then inserted 902. Final rollback preserved 901, removed the uncommitted 902, and left no live debug target or process.
+
+The following R6 and earlier results are historical records; their complete suites were not rerun for this build:
 
 Validation of the 2026-11-03 R6 build:
 
@@ -224,6 +249,7 @@ The 2026-10-14 baseline previously passed centralized and distributed 505 live-d
 ## 9. Current boundaries
 
 - This ecosystem release contains only the Kylin V10 x86_64 package; ARM64 and Windows packages are not included.
+- Current object-parameter GUI coverage is limited to the composite examples above. It does not establish GUI acceptance for every user-defined object, array, or domain type. The translated Kylin container shares the LinuxKit kernel; these results do not replace native x86 hardware or customer virtual-desktop acceptance.
 - Locally rebuilt Linux native libraries in the package are not digitally signed. Verify integrity with the published SHA-256 digest and product manifest.
 - GaussDB JDBC, `gs_dump`, `gs_restore`, and other native database tools are not distributed with the client.
 - PL/SQL debugging depends on server debug APIs, compatibility mode, routine language, and user permissions.
