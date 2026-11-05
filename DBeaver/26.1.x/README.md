@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-构建版本：`26.1.5.20261103r6`；更新日期：2026-11-03。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
+构建版本：`26.1.5.20261105r1`；更新日期：2026-11-05。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
 
 ## 1. 概述
 
@@ -19,10 +19,13 @@
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261103-r6)
-- 源码修订：`590b4395c1c512257b95248a6d1bd26415f4c644`
+- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r1)
+- 源码修订：`3f3bf7ed186ee3edb7c86673a65ebf7e49bc2ecb`
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
+
+- [图形界面操作手册（在线阅读，含截图）](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GAUSSDB_GUI_OPERATION_MANUAL_20260922.md)
+- [详细操作手册（Word）](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GaussDB_DBeaver_调试与Package操作手册_20261014.docx)
 
 ## 2. 适用范围
 
@@ -30,7 +33,7 @@
 | --- | --- |
 | 客户端版本 | DBeaver 26.1.5 GaussDB 增强版 |
 | 客户端系统 | 麒麟 V10 x86_64 |
-| 已验数据库 | 历史基线：GaussDB 505.2.1.SPC0800 集中式与分布式；本次游标状态增强：GaussDB 507 集中式 ORA，具体结果见第 8 节 |
+| 已验数据库 | 历史基线：GaussDB 505.2.1.SPC0800 集中式与分布式；本次复合对象参数及事务提示修复：GaussDB 507 集中式 ORA，具体结果见第 8 节 |
 | 数据库兼容模式 | 支持识别 ORA/A、MYSQL/B、TD/C、PG、M；具体功能按服务端能力开放 |
 | PL/SQL 调试 | 服务端具备 `DBE_PLDEBUGGER` 接口且用户有相应权限时开放 |
 | Package | 以支持 Package 的集中式 ORA 环境为完整能力范围；其他部署形态按服务端能力降级 |
@@ -41,21 +44,21 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6/SHA256SUMS)
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/SHA256SUMS)
 
 SHA-256：
 
 ```text
-b5e1492025d1c414bb71d69d8bf09aa34297b4d6875472a0ca674213b6df1a7c  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
+e730de0140fc2f262f31a8588452c68204ad88d1706ec2fd806c87207ba47ad1  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
 ```
 
 下载后执行：
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
+sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
 uname -m
 ```
 
@@ -66,7 +69,7 @@ uname -m
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -114,6 +117,12 @@ GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的
 5. 选择数据源和例程，为所有 `IN`/`INOUT` 参数填写值。
 6. 点击“调试”。
 
+复合对象入参以数据库类型的文本格式填写，例如 `(1,张三)`；字段内包含逗号时为该字段加双引号，例如 `(2,"Alice, Jr.")`，整个输入值不再包一层 SQL 单引号。调试器依据参数真实类型 OID 读取所属 Schema，并在调用中限定用户定义类型的名称；过程和类型位于不同 Schema 时也能找到对应类型。内置数值、文本等参数沿用原有调用方式。
+
+需要把整个参数设为 SQL NULL 时，在“输入方式”中选择 SQL NULL；不要用字符串值代替空值。当前仍通过文本输入复合对象，并未提供逐字段对象编辑器。
+
+![复合类型入参暂停后的字段值](./imgs/object-parameter-debug.png)
+
 “运行”→“运行配置...”通用菜单仍保留，供其他启动类型使用；数据库调试类型只在“调试配置”中提供。普通 SQL 请在 SQL 编辑器中执行。旧版本若从“运行配置”中新建时提示 `No tab group defined`，先关闭该窗口并改用上述数据库调试入口，再更新到本页构建；不要删除工作区。
 
 ![调试源码和断点](./imgs/debug-source.png)
@@ -148,7 +157,7 @@ GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的
 
 ![调用堆栈](./imgs/call-stack.png)
 
-调试结束时，可以选择提交或回滚调试产生的数据修改。生产或共享环境中，建议默认选择回滚，确认结果后再执行正式事务。
+调试结束时，对话框默认选择“回滚剩余事务并结束”，只处理目标连接中尚未完成的剩余事务。若过程或函数内部已经执行 `COMMIT`，这些已提交的数据无法由结束时的“回滚”撤销；之后产生且仍未提交的修改才由本次选择处理。这里的“提交／回滚”处理数据库数据，不负责保存编辑器中的源码；源码修改应先在对象编辑器中保存并编译。
 
 ![调试事务选择](./imgs/debug-transaction-choice.png)
 
@@ -167,6 +176,12 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 断点标签显示连接标识，包括使用自定义标签的断点。对同一代码行切换断点时，会清除全部匹配的重复记录，并保留其他连接的断点。客户端不会自动清空历史断点；不再使用的断点可以在“断点”视图中选中后删除，或取消勾选以禁用。
 
 在“断点”视图中，单击条目只选中断点，双击才打开源码并定位到断点行；仅切换到“断点”等视图页签不会自动打开源码。初次打开或加载较慢时，会等待源码文档加载完成，再定位执行行和执行箭头。关闭源码页签或切换到其他视图后，过期的异步源码加载结果会被忽略，避免源码页签再次打开或抢回焦点。
+
+### 6.6 修改并保存存储过程源码
+
+先结束本轮调试并处理剩余事务，再从导航树展开 **连接 → 数据库 → 模式 → 目标 Schema → 存储过程**，双击具体过程，在对象编辑器选择 **属性 → 源**。修改完整的 `CREATE OR REPLACE` 定义后按 **Ctrl+S**，检查保存 SQL 并确认。保存成功后重新启动调试；暂停中的代码不支持热替换。
+
+![普通存储过程源码入口：红框标出对象与“源”](./imgs/routine-source-entry.png)
 
 ## 7. Package 编译和错误定位
 
@@ -189,6 +204,16 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 分布式版本若不支持强制创建无效包体或编译错误系统视图，客户端会显示服务端直接返回的编译错误，不会把该路径报告为“错误定位成功”。
 
 ## 8. 验证结果
+
+2026-11-05 R1 构建的验证结果：
+
+- 修复跨 Schema 复合对象参数调用：根据参数真实类型 OID 读取类型所属 Schema，调用时限定用户定义类型名称，避免类型不在当前搜索路径中时启动失败；内置参数类型保持原有形式。
+- 事务结束对话框明确只处理剩余事务，提示过程内部已提交数据不能回滚，且该操作不保存源码；默认选择回滚。
+- 主工程回归：3137 项，2953 通过、184 项按条件跳过、0 失败、0 错误；比 R6 新增 7 项回归。204 个产品构建模块成功，最终解压通过 1202 项产品文件清单校验；6 个关键生产插件与实际 GUI 验收副本字节一致。
+- 507 集中式 ORA 图形验证：在通过 Rosetta／指令转译运行、共享 LinuxKit 内核的麒麟 V10 x86_64 容器中，复合对象 `(1,张三)` 与包含逗号的 `(2,"Alice, Jr.")` 均启动调试并暂停，字段值读取正确；实际提交后，独立连接读回结果与输入一致。
+- SQL NULL 与过程内部 COMMIT 验证：整对象 SQL NULL 入参成功启动并结束，提交后由独立连接确认空值记录；两个复合对象样例与空值样例各读回一行。507 的 `info_locals()` 对 NULL 复合字段可显示 `0／<UNKNOWN>`，不将该占位显示当成字段真实值。内部 COMMIT 用例先插入 901 并提交，再插入 902；结束时选择“回滚剩余事务并结束”，独立连接确认 901 保留、902 不存在，且无存活调试目标或进程。
+
+以下 2026-11-03 R6 及更早构建为历史记录，不表示其全部场景已在本次重跑：
 
 2026-11-03 R6 构建的验证结果：
 
@@ -224,6 +249,7 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 ## 9. 当前边界
 
 - 本 Release 只提供麒麟 V10 x86_64 包，不包含 ARM64 和 Windows 包。
+- 本次对象参数 GUI 验证限于上述复合类型样例，不声明所有用户定义对象、数组或 domain 类型均已通过图形验收。麒麟容器共享 LinuxKit 内核并通过指令转译运行，结果不替代原生 x86 实机或客户桌面云验收。
 - 包内本地重建的 Linux 原生库未进行数字签名，请以本页公布的 SHA-256 和产品文件清单校验完整性。
 - GaussDB JDBC 驱动、`gs_dump`、`gs_restore` 等数据库原生工具不随客户端分发。
 - PL/SQL 调试依赖服务端调试接口、兼容模式、例程语言和用户权限。

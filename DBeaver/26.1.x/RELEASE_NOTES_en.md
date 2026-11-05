@@ -1,8 +1,8 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Release Notes
 
-Build: `26.1.5.20261103r6`; updated on 2026-11-03. The release tag, archive, product manifest and checksums all identify this build.
+Build: `26.1.5.20261105r1`; updated on 2026-11-05. The release tag, archive, product manifest and checksums all identify this build.
 
-Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261103-r6`
+Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1`
 
 ## Assets
 
@@ -10,8 +10,8 @@ This release contains only the Kylin V10 x86_64 edition:
 
 | File | Purpose | SHA-256 |
 | --- | --- | --- |
-| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.tar.gz` | Client archive | `b5e1492025d1c414bb71d69d8bf09aa34297b4d6875472a0ca674213b6df1a7c` |
-| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261103-r6.PRODUCT-MANIFEST.json` | Package file manifest | `3943c9db89da05ab3b9d6e42a70769f5c94708715ac10505150a1a518855f963` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz` | Client archive | `e730de0140fc2f262f31a8588452c68204ad88d1706ec2fd806c87207ba47ad1` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.PRODUCT-MANIFEST.json` | Package file manifest | `ec5727fd83c39d0dff7200f794e20a50c6b88ea91fda2a1c9119e51d4ecbb90d` |
 | `SHA256SUMS` | Checksum entry point for the two payload files above | Generated and read back during publication |
 
 ## Highlights
@@ -25,6 +25,16 @@ This release contains only the Kylin V10 x86_64 edition:
 - Simplified Chinese resources and an illustrated operation manual.
 
 ## Repairs and validation in this build
+
+- 2026-11-05 R1: Resolve the actual parameter type OID and qualify user-defined types with their owning schema, fixing cross-schema composite calls that failed because the schema was missing. Built-in type formatting is preserved.
+- 2026-11-05 R1: The completion dialog explicitly applies Commit/Rollback only to the remaining transaction. Commits already executed by the routine cannot be undone; this choice does not save source code and defaults to Rollback.
+- Main regression: 3,137 cases, with 2,953 passed, 184 conditionally skipped, zero failures or errors; seven cases were added since R6.
+- Centralized 507 ORA GUI: a translated Kylin V10 x86_64 container sharing the LinuxKit kernel debugged `(1,张三)` and `(2,"Alice, Jr.")`, paused, and displayed their fields. An actual commit was verified from an independent connection.
+- SQL NULL and internal-COMMIT verification: A whole-object SQL NULL argument launched and completed successfully; an independent connection confirmed one committed row for each composite example and one SQL NULL row. On 507, `info_locals()` can display NULL composite fields as `0/<UNKNOWN>`; these placeholders are not claimed as exact field values. The internal-COMMIT scenario inserted 901 and committed, then inserted 902. Final rollback preserved 901, removed the uncommitted 902, and left no live debug target or process.
+
+- Final product: all 204 build modules succeeded; fresh extraction passed all 1202 inventory entries, and 6 key production plugins byte-match the tested GUI copy.
+
+The following R6 and earlier results are historical records; their complete suites were not rerun for this build:
 
 - R6: Display cursor information already supplied by `info_locals()` as a state summary and read-only `%ISOPEN`, `%FOUND`, `%NOTFOUND`, and `%ROWCOUNT` children; show `NAME` when available and `PACKAGE` for Package cursors. Equal cursor names from different packages are preserved in the frame, and an unqualified attribute watch reports ambiguity. Watches support the cursor variable and attributes such as `cur%ROWCOUNT`.
 - R6: Match older hidden attributes by complete cursor name, Package, and call frame, avoiding prefix collisions and cross-scope values. Preserve missing, invalid, duplicate, or conflicting protocol data rather than inventing state. The cursor and children cannot be edited; no additional FETCH, query rerun, or private setting is introduced.
@@ -64,6 +74,7 @@ The R5, R4, R3, and R2 entries below are historical records; their complete suit
 ## Boundaries
 
 - ARM64 and Windows packages are not included in this release.
+- Composite-argument GUI coverage is limited to the listed examples, not all object, array, or domain types. The translated container shares the LinuxKit kernel and does not constitute native x86 hardware acceptance.
 - Locally rebuilt Linux native libraries in the package are not digitally signed; use SHA-256 and the product manifest for integrity verification.
 - The x86_64 GUI check used a Kylin V10 x86_64 user space with host instruction translation; it does not replace final target-device or virtual-desktop admission testing.
 - The GaussDB JDBC driver and native database tools are not bundled.
