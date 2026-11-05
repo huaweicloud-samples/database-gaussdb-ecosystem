@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Build: `26.1.5.20261105r1`; updated on 2026-11-05. The release tag, archive, product manifest and checksums all identify this build.
+Application build: `26.1.5.20261105r1`; delivery revision: `20261105-r2`; updated on 2026-11-05. R2 updates the connection manual to V1.9 and delivers the complete enhanced source. Java plug-ins retain the R1 build; the archives, manual, source and checksums identify this delivery revision.
 
 ## 1. Overview
 
@@ -19,13 +19,14 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r1)
-- Source revision: `3f3bf7ed186ee3edb7c86673a65ebf7e49bc2ecb`
+- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r2)
+- Source revision: `e6382732e5fdcba34ecea6099870960b1b3d0b0a`
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
-- [Illustrated GUI operation manual (Chinese)](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GAUSSDB_GUI_OPERATION_MANUAL_20260922.md)
-- [Detailed operation manual (Word, Chinese)](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GaussDB_DBeaver_调试与Package操作手册_20261014.docx)
+- [Illustrated GUI operation manual (Chinese)](./GAUSSDB_GUI_OPERATION_MANUAL.md)
+- [Detailed V1.9 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
+- [Source components and revisions](./SOURCE-REVISIONS.json)
 
 ## 2. Scope
 
@@ -42,23 +43,27 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 ## 3. Download and integrity verification
 
-The ecosystem release currently contains only the recently validated Kylin V10 x86_64 client:
+This ecosystem release provides the Kylin V10 x86_64 client archive, product manifest, complete enhanced source, and a standalone Word manual. `SHA256SUMS` covers these four payload files:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/SHA256SUMS)
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz)
+- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/SHA256SUMS)
+- [Complete enhanced source, including matching dbeaver-common](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz)
+- [V1.9 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
 
-SHA-256:
+The default **Source code (zip/tar.gz)** links on the GitHub Release page archive the ecosystem documentation repository. For this enhanced DBeaver source, download the explicitly named `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz` above. It contains complete `dbeaver/` and matching `dbeaver-common/` trees plus a file-hash `SOURCE-MANIFEST.json`.
+
+Client archive SHA-256:
 
 ```text
-e730de0140fc2f262f31a8588452c68204ad88d1706ec2fd806c87207ba47ad1  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
+e35365c5c3af67ab8a73e63b7aaf73287b09df60caf82d7526e2ba079730c8c5  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
 ```
 
 Verify the download and architecture:
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
+sha256sum -c SHA256SUMS
 uname -m
 ```
 
@@ -69,7 +74,7 @@ uname -m
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -91,16 +96,24 @@ To force Simplified Chinese at startup:
 
 After the main window closes, background processes may need several seconds to save and release the workspace. Wait for the previous process to exit before starting another instance, or DBeaver may report `Can't lock workspace`.
 
-## 5. Configure the GaussDB JDBC driver
+## 5. Create the first connection and configure JDBC
+
+Complete the connection before starting routine or Package debugging. See the [online illustrated manual](./GAUSSDB_GUI_OPERATION_MANUAL.md) for full-window screenshots and annotations, or download the Word manual for offline use.
+
+1. Obtain the reachable server host, port, database name, account, and compatibility mode from the database administrator. The host is a database endpoint, not the client extraction directory.
+2. Open **Database → New Database Connection**, or the new-connection toolbar action, and select GaussDB Native for O/Oracle mode. Add the matching JDBC JAR as described below.
+3. Enter the connection details, run **Test Connection**, and finish the wizard. Confirm that the connection expands in **Database Navigator**.
+4. Expand the database and schema, check the tables and supported routines or packages, then follow sections 6 and 7 for debugging and compilation.
+
 
 The distribution does not bundle a GaussDB JDBC driver. Use an organization-approved driver that matches the target database version:
 
 1. Start DBeaver and select **Database** > **Driver Manager**.
-2. Select `GaussDB` and choose **Edit**.
+2. For O/Oracle mode, select **GaussDB Native** and choose **Edit**, or use **Edit Driver Settings** in the new-connection wizard.
 3. Add the GaussDB JDBC JAR on the **Libraries** page.
-4. Confirm that the driver class is the GaussDB JDBC class supplied by that package.
+4. Confirm `com.huawei.gaussdb.jdbc.Driver` and the `jdbc:gaussdb:` protocol. Do not mix PostgreSQL jars or conflicting driver versions into this definition.
 5. Create a connection and enter the host, port, database, user, and password.
-6. Run **Test Connection** and confirm the server version, compatibility mode, and user.
+6. Run **Test Connection** and finish the wizard after it succeeds. Use SQL to query `version()`, `current_database()`, `current_user`, and `pg_settings.sql_compatibility` to confirm the actual target; the success dialog does not replace these queries.
 
 The client does not silently alter private session parameters. If a server capability requires an additional parameter, the capability check or server error reports it explicitly so that a user or database administrator can review and set it deliberately.
 
@@ -205,6 +218,8 @@ If a distributed server does not support forced invalid Package bodies or compil
 
 ## 8. Validation results
 
+R2 is a connection-manual and source-delivery revision. Java plug-ins remain the R1 build; the R1 full-regression records below were not rerun for R2. Validation of the new connection walkthrough: A translated Kylin V10 x86_64 container connected to centralized 507 ORA using a fresh connection wizard, the native driver and a local JDBC jar; field entry, authentication without saved password, successful connection test, saved navigation, SQL queries confirming Kernel 507/current database/user/sql_compatibility=A, and the Error Log view were exercised. Thirteen complete-window screenshots were captured. The revised Word manual has 43 pages and 24 images, all visually checked.
+
 Validation of the 2026-11-05 R1 build:
 
 - Fix cross-schema composite argument calls by resolving the parameter's actual type OID and qualifying its owning schema. User-defined types no longer depend on the current search path; built-in type formatting is preserved.
@@ -257,6 +272,27 @@ The 2026-10-14 baseline previously passed centralized and distributed 505 live-d
 - Paused local cursors expose server-supplied state only. Result rows, original SQL, and column-structure previews require a future server interface. The older name-based hidden format is covered by protocol-fixture unit tests; the current live-server coverage uses the 507 inline format.
 - Before first use in a target environment, verify the digest and run organization-specific connection, debugging, transaction, and Package acceptance tests.
 
-## 10. Licensing
+## 10. Build from the delivered source
+
+The complete source archive contains sibling `dbeaver/` and `dbeaver-common/` directories. The latter is pinned to official commit `2df03e58480c6325732f476e8355e375cec5405e`; do not replace it with a moving branch. See the [component record](./SOURCE-REVISIONS.json) and the archive's `SOURCE-MANIFEST.json` for revisions and origins.
+
+Install JDK 21+ and Maven 3.9.x, extract the source archive, and enter its `dbeaver` directory. Replace the JDK path below with the actual installation path and confirm that `mvn -v` uses Java 21+:
+
+```bash
+export JAVA_HOME=/absolute/path/to/jdk-21
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+mvn -v
+mvn -f product/aggregate/pom.xml -Pproduct-dbeaver-ce package \
+  -DskipTests=true -Dskip-checkstyle=true -Dspotless.check.skip=true \
+  -DforceContextQualifier=20261105r1 \
+  -Dbuild-timestamp=20261105r1
+```
+
+The application qualifier remains `20261105r1`; `20261105-r2` identifies the manual/source delivery revision. `-DskipTests=true` packages the product without executing tests. Maven/P2 dependencies must be reachable or available in a complete, matching offline cache; downloading the source alone does not guarantee an automatic offline build.
+
+The command builds the Java/Eclipse product. Recreating the Kylin archive additionally requires matching native libraries, pinned SWT/Equinox sources, JRE, Node.js 22+, and assembly tools. See `product/community/kylin/README.zh-CN.md` and `THIRD-PARTY-SOURCES.md` in the source. Auditable source and platform build validation do not imply byte-identical rebuilds. Upstream and historical Markdown files remain source material; use the linked V1.9 manual for customer operations.
+
+## 11. Licensing
 
 DBeaver Community source and these enhancements are provided under the applicable Apache License 2.0 terms. Bundled third-party components remain under their respective licenses; third-party source and license information is included in the package.

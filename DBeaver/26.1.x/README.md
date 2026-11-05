@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-构建版本：`26.1.5.20261105r1`；更新日期：2026-11-05。Release 标签、安装包、文件清单和校验文件统一对应本次构建。
+应用构建：`26.1.5.20261105r1`；交付修订：`20261105-r2`；更新日期：2026-11-05。R2 更新连接操作手册 V1.9 和完整源码交付，应用 Java 插件沿用 R1 构建；归档、手册、源码及校验文件对应本次交付修订。
 
 ## 1. 概述
 
@@ -19,13 +19,14 @@
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r1)
-- 源码修订：`3f3bf7ed186ee3edb7c86673a65ebf7e49bc2ecb`
+- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r2)
+- 源码修订：`e6382732e5fdcba34ecea6099870960b1b3d0b0a`
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
-- [图形界面操作手册（在线阅读，含截图）](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GAUSSDB_GUI_OPERATION_MANUAL_20260922.md)
-- [详细操作手册（Word）](https://github.com/jarrenL/dbeaver/blob/gaussdb-2615-x86_64-beta-20261105-r1/GaussDB_DBeaver_调试与Package操作手册_20261014.docx)
+- [图形界面操作手册（在线阅读，含截图）](./GAUSSDB_GUI_OPERATION_MANUAL.md)
+- [详细操作手册 V1.9（Word，直接下载）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
+- [源码组件与修订记录](./SOURCE-REVISIONS.json)
 
 ## 2. 适用范围
 
@@ -42,23 +43,29 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 ## 3. 下载与完整性校验
 
-本次生态仓 Release 仅提供近期主测的麒麟 V10 x86_64 客户端：
+本次生态仓 Release 提供麒麟 V10 x86_64 客户端归档、产品文件清单、完整增强源码和独立 Word 手册；`SHA256SUMS` 覆盖这四个交付文件：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1/SHA256SUMS)
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2)
+- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz)
+- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/SHA256SUMS)
+- [完整增强源码（含匹配的 dbeaver-common）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz)
+- [连接与调试操作手册 V1.9（Word）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_调试与Package操作手册_20261105.docx)
 
-SHA-256：
+普通安装使用客户端下载和 Word 手册即可；需要自行编译或审阅实现时再下载完整增强源码。
+
+GitHub Release 页面自动提供的 **Source code (zip/tar.gz)** 是生态仓本身的文档树快照。要获取本增强版 DBeaver 源码，请下载上述显式命名的 `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz`；其中包含完整 `dbeaver/`、精确匹配的 `dbeaver-common/` 和逐文件哈希记录 `SOURCE-MANIFEST.json`。
+
+客户端归档 SHA-256：
 
 ```text
-e730de0140fc2f262f31a8588452c68204ad88d1706ec2fd806c87207ba47ad1  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
+e35365c5c3af67ab8a73e63b7aaf73287b09df60caf82d7526e2ba079730c8c5  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
 ```
 
 下载后执行：
 
 ```bash
-sha256sum dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
+sha256sum -c SHA256SUMS
 uname -m
 ```
 
@@ -69,7 +76,7 @@ uname -m
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -91,16 +98,24 @@ chmod +x dbeaver
 
 关闭窗口后，后台进程可能还需十几秒保存工作区并退出。请等待进程结束后再启动下一实例，否则可能出现 `Can't lock workspace`。
 
-## 5. 配置 GaussDB JDBC 驱动
+## 5. 首次创建连接与配置 JDBC 驱动
+
+先按以下顺序完成连接，再进入存储过程或 Package 调试。详细全窗口截图与逐步标注见[在线操作手册](./GAUSSDB_GUI_OPERATION_MANUAL.md)，也可下载上面的 Word 手册离线查看。
+
+1. 确认数据库管理员提供的主机、端口、数据库名、账号及兼容模式；数据库地址填写服务器可访问地址，而不是本机解压目录。
+2. 通过“数据库 → 新建数据库连接”或工具栏“新建连接”进入向导，选择 GaussDB 驱动；按以下步骤添加与目标库版本匹配的 JDBC JAR。
+3. 填写连接参数，执行“测试连接”。成功后完成向导，在左侧“数据库导航器”确认连接可展开。
+4. 展开目标数据库与 Schema，确认可以看到表及受支持的存储过程／函数／包；再按第 6、7 节配置调试和编译。
+
 
 发布包不内置 GaussDB JDBC 驱动。请使用与目标数据库版本匹配、经过组织审批的驱动：
 
 1. 启动 DBeaver，选择“数据库”→“驱动管理器”。
-2. 选择 `GaussDB`，点击“编辑”。
+2. O/Oracle 模式选择 **GaussDB 原生驱动（GaussDB Native）**，点击“编辑”；也可在新建连接向导里点击“编辑驱动设置”。
 3. 在“库”页添加 GaussDB JDBC JAR。
-4. 确认驱动类为驱动包提供的 GaussDB JDBC 类。
+4. 确认原生驱动类为 `com.huawei.gaussdb.jdbc.Driver`，URL 协议为 `jdbc:gaussdb:`；不要混入 PostgreSQL jar 或多个冲突版本。
 5. 保存后新建连接，填写主机、端口、数据库、用户名和密码。
-6. 点击“测试连接”，确认数据库版本、兼容模式和当前用户均符合预期。
+6. 点击“测试连接”，成功后完成向导。再在 SQL 编辑器查询 `version()`、`current_database()`、`current_user` 和 `pg_settings.sql_compatibility`，确认真实目标；测试成功框不代替这些查询。
 
 客户端不会在后台静默修改会话级私有参数。若特定服务端能力要求额外参数，能力检查或错误信息会明确提示，由用户或数据库管理员确认后显式设置。
 
@@ -205,6 +220,8 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 
 ## 8. 验证结果
 
+2026-11-05 R2 是连接操作手册和源码交付修订。Java 插件仍为 R1 构建，不将下面的 R1 全量回归记录表述为 R2 已重新执行。新增连接操作图的验证情况：麒麟 V10 x86_64 转译容器连接 507 集中式 ORA，从全新连接向导选择原生驱动、添加本地 JDBC、填写连接字段、不保存密码时完成认证、测试成功、保存连接、展开目标 schema 和表、打开 SQL 编辑器，真实查询确认 Kernel 507、当前库/用户及 sql_compatibility=A，并打开错误日志视图；形成 13 张全窗口截图。新版 Word 为 43 页、24 图，已全页检查。
+
 2026-11-05 R1 构建的验证结果：
 
 - 修复跨 Schema 复合对象参数调用：根据参数真实类型 OID 读取类型所属 Schema，调用时限定用户定义类型名称，避免类型不在当前搜索路径中时启动失败；内置参数类型保持原有形式。
@@ -257,6 +274,27 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 - 暂停调试中的局部游标仅支持服务端返回的状态；结果行、原 SQL 和列结构预览仍依赖后续内核接口。旧式按名称隐藏属性仅完成协议样例单测，本次真库覆盖的是 507 内联状态格式。
 - 首次用于目标环境时，应按照组织的软件准入流程核对摘要，并完成连接、调试、事务和 Package 场景验收。
 
-## 10. 许可证
+## 10. 从交付源码构建
+
+完整源码归档包含相邻的 `dbeaver/` 与 `dbeaver-common/`。`dbeaver-common` 固定为官方提交 `2df03e58480c6325732f476e8355e375cec5405e`，不要替换为以后变化的最新分支；源码修订和上游地址见[组件记录](./SOURCE-REVISIONS.json)与归档内 `SOURCE-MANIFEST.json`。
+
+在安装 JDK 21 或更高版本、Maven 3.9.x 的构建机上，解压归档，进入其中的 `dbeaver` 目录后执行。将下面的 JDK 路径替换为本机实际路径，并通过 `mvn -v` 确认它使用 Java 21+：
+
+```bash
+export JAVA_HOME=/absolute/path/to/jdk-21
+export PATH="$JAVA_HOME/bin:$PATH"
+java -version
+mvn -v
+mvn -f product/aggregate/pom.xml -Pproduct-dbeaver-ce package \
+  -DskipTests=true -Dskip-checkstyle=true -Dspotless.check.skip=true \
+  -DforceContextQualifier=20261105r1 \
+  -Dbuild-timestamp=20261105r1
+```
+
+这里保留应用构建限定符 `20261105r1`；`20261105-r2` 是手册与源码的交付修订。`-DskipTests=true` 仅用于打包，不表示执行了测试。构建需要 Maven/P2 依赖可访问，或事先准备齐全并匹配的离线依赖缓存；只下载源码不能保证完全离线自动构建。
+
+该命令生成 Java/Eclipse 产品。复现本次麒麟归档还需要匹配架构的原生库、固定版本的 SWT／Equinox 源码、JRE、Node.js 22+ 及组装工具，具体见源码内 `product/community/kylin/README.zh-CN.md` 和 `THIRD-PARTY-SOURCES.md`。源码可复核与目标平台构建验证不等于重新构建文件必然逐字节相同。上游或历史 Markdown 文件属于源码资料，客户日常操作以本页链接的 V1.9 操作手册为准。
+
+## 11. 许可证
 
 DBeaver Community 源码及本增强版本遵循其适用的 Apache License 2.0。第三方组件继续遵循各自许可证；包内提供第三方源码与许可证说明。

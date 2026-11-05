@@ -1,18 +1,20 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Release Notes
 
-Build: `26.1.5.20261105r1`; updated on 2026-11-05. The release tag, archive, product manifest and checksums all identify this build.
+Application build: `26.1.5.20261105r1`; delivery revision: `20261105-r2`; updated on 2026-11-05. R2 updates the connection manual to V1.9 and delivers the complete enhanced source. Java plug-ins retain the R1 build; the archives, manual, source and checksums identify this delivery revision.
 
-Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r1`
+Release tag: `dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2`
 
 ## Assets
 
-This release contains only the Kylin V10 x86_64 edition:
+This delivery includes the Kylin V10 x86_64 client, product manifest, complete enhanced source, and standalone Word manual:
 
 | File | Purpose | SHA-256 |
 | --- | --- | --- |
-| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.tar.gz` | Client archive | `e730de0140fc2f262f31a8588452c68204ad88d1706ec2fd806c87207ba47ad1` |
-| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r1.PRODUCT-MANIFEST.json` | Package file manifest | `ec5727fd83c39d0dff7200f794e20a50c6b88ea91fda2a1c9119e51d4ecbb90d` |
-| `SHA256SUMS` | Checksum entry point for the two payload files above | Generated and read back during publication |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz` | Client archive | `e35365c5c3af67ab8a73e63b7aaf73287b09df60caf82d7526e2ba079730c8c5` |
+| `dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json` | Package file manifest | `ec5727fd83c39d0dff7200f794e20a50c6b88ea91fda2a1c9119e51d4ecbb90d` |
+| `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz` | Enhanced source, matching dbeaver-common, and internal hash manifest | `8ea7e6e10dfba5e7291a4b6983792747a2bacd9e99fa7abf93c99bea45d4ce9f` |
+| `GaussDB_DBeaver_调试与Package操作手册_20261105.docx` | V1.9 connection, debugging, and Package operation manual | `9341e530517a9a6eb2cefa01b0db257fa2e7782be7e8347089919727fb2f0780` |
+| `SHA256SUMS` | Checksum entry point for the four payload files above | Generated and read back during publication |
 
 ## Highlights
 
@@ -25,6 +27,14 @@ This release contains only the Kylin V10 x86_64 edition:
 - Simplified Chinese resources and an illustrated operation manual.
 
 ## Repairs and validation in this build
+
+- 2026-11-05 R2 is a delivery revision: V1.9 adds illustrated first-connection, JDBC configuration, and result-checking steps, with a standalone Word manual. Java plug-ins retain application build `26.1.5.20261105r1`.
+- The ecosystem Release now provides an explicitly named enhanced-source archive containing the final DBeaver source, official dbeaver-common commit `2df03e58480c6325732f476e8355e375cec5405e`, and an internal `SOURCE-MANIFEST.json`. GitHub's default Source code links still archive the ecosystem documentation tree.
+- Connection-walkthrough validation: A translated Kylin V10 x86_64 container connected to centralized 507 ORA using a fresh connection wizard, the native driver and a local JDBC jar; field entry, authentication without saved password, successful connection test, saved navigation, SQL queries confirming Kernel 507/current database/user/sql_compatibility=A, and the Error Log view were exercised. Thirteen complete-window screenshots were captured. The revised Word manual has 43 pages and 24 images, all visually checked. The R1 full-regression and product-build results below are existing records, not new R2 runs.
+
+The R2 archive was freshly extracted and passed all 1202 application inventory entries, identical to R1. Its Word document and 24 images match the committed files. The extracted enhanced-source archive passed all 10841 file/link records. The source parent project also passed nonrecursive Maven validate without Git metadata; this is not a new complete product build. Five documentation packaging checks passed.
+
+The following repairs and validation belong to the 2026-11-05 R1 application build:
 
 - 2026-11-05 R1: Resolve the actual parameter type OID and qualify user-defined types with their owning schema, fixing cross-schema composite calls that failed because the schema was missing. Built-in type formatting is preserved.
 - 2026-11-05 R1: The completion dialog explicitly applies Commit/Rollback only to the remaining transaction. Commits already executed by the routine cannot be undone; this choice does not save source code and defaults to Rollback.
