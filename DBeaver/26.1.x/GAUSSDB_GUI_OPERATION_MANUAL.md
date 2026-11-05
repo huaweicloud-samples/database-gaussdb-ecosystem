@@ -2,7 +2,7 @@
 
 更新日期：2026-11-05。适用于数据库开发、测试及运维人员。本文可直接在代码仓库在线阅读，无需下载 HTML 文件。
 
-适用版本：DBeaver 26.1.5 GaussDB 适配版，应用构建 `26.1.5.20261105r3`，交付修订 `20261105-r3`。在线说明新增分区表与二级分区展示指引；独立 Word 手册 V1.10 同步更新连接、调试、Package 及分区操作指导。源码版本见发布页的构建清单；适用条件和验证范围见第 14 节。
+适用版本：DBeaver 26.1.5 GaussDB 适配版，应用构建 `26.1.5.20261105r3`，交付修订 `20261105-r3`。在线说明新增分区表与二级分区展示指引；独立 Word 手册 V1.11 同步更新连接、调试、Package 及分区操作指导。源码版本见发布页的构建清单；适用条件和验证范围见第 14 节。
 
 华为云生态仓发布页（完整地址）：https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-20261105-r3
 
@@ -72,7 +72,27 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 
 R3 新建连接列表只有一个 **GaussDB** 入口，供 O/A/ORA 与 M 兼容库使用。旧的三个驱动定义从新建列表隐藏，但仍保留供已有连接加载，无需删除重建。默认常用 `gsjdbc4.jar` 使用 `org.postgresql.Driver` 与 `jdbc:postgresql:`；若官方 JAR 实际提供 `com.huawei.gaussdb.jdbc.Driver`，可在驱动管理器中配套使用 `jdbc:gaussdb:`。按 JAR 实际类名选择协议，不凭文件名判断，也不因 O 模式而强制更换驱动包。连接 M 库时显式勾选 **M 兼容库：mCompatible=true、yearIsDateType=true**；O/A/ORA 库不勾。此选项只设置本连接的 JDBC 参数，不修改数据库兼容模式。 URL 模式请勿在查询串中重复填写 `mCompatible` 或 `yearIsDateType`；页面会提示移除冲突项，以保证勾选设置与实际生效值一致。
 
-连接图 C01～C09 来自通过转译运行的麒麟 V10 x86_64 容器，实际连接 GaussDB 507 O/Oracle 兼容演示库。截图用于说明控件位置；`host.docker.internal:55452`、`dbv_connect_20261105` 和 `manual_demo` 是演示环境信息，请替换为 DBA 提供的实际地址、数据库、账号和 schema。
+### R3 当前连接界面：统一入口和显式 JDBC 选项
+
+1. 点击“数据库 → 新建数据库连接”，搜索 `GaussDB`。列表只显示一个 **GaussDB**；选中后点击“下一步”。
+
+![R3 统一 GaussDB 连接入口](./imgs/new-connection-gaussdb.png)
+
+2. 在“主要”页填写 DBA 提供的地址、端口、数据库及账号。**M 库勾选 M 兼容选项，A/O 库不勾选**；勾选会为本连接写入 `mCompatible=true` 和 `yearIsDateType=true`，不修改数据库模式。
+
+![R3 主要页面的 M 兼容选项](./imgs/connection-m-options.png)
+
+3. 点击右下角“编辑驱动设置”，在“库”页添加匹配的官方 JDBC JAR，在“设置”页核对实际驱动类。常用 `gsjdbc4.jar` 对应 `org.postgresql.Driver`。主机模式按驱动类生成实际 JDBC URL；URL 模板在此驱动中只读，请回到“主要”页核对实际 URL。仅在 JAR 实际提供 `com.huawei.gaussdb.jdbc.Driver` 时才选择原生类，配套协议为 `jdbc:gaussdb:`。
+
+![R3 驱动类设置](./imgs/connection-driver-class.png)
+
+4. 连接页面上方“驱动属性”用于查看或编辑当前连接的 JDBC 参数。M 参数请使用主页面的复选项；其他参数按 DBA 或驱动文档要求配置。URL 查询串不要重复填写 `mCompatible` 或 `yearIsDateType`，否则会明确报错并禁用测试与完成。图中 `mCompatible=true` 与主页面已勾选的 M 选项一致。
+
+![R3 当前连接的 JDBC 属性](./imgs/connection-driver-properties.png)
+
+以上四图展示当前统一入口及 JDBC 选项，其中 M 选项来自已验证的 M 库连接。下方使用 A/O 库演示完整主流程，因此不勾选 M 兼容选项；按实际点击顺序说明从打开向导、添加本地驱动到测试连接、浏览对象和执行 SQL 的操作。界面截图均对应本版客户端。
+
+连接图 C01～C09 展示麒麟 V10 x86_64 客户端使用统一 **GaussDB** 入口、匹配的 `gsjdbc4.jar` 连接 GaussDB 507 集中式 A/Oracle 兼容演示库。演示地址为 `host.docker.internal:55452`，数据库和账号均为 `dbv_current_20261105`，schema 为 `manual_demo`，测试表为 `sample_orders(id, customer_name)`。这些值仅为演示，请替换为 DBA 提供的实际信息；数据库账号与 schema 是不同概念。
 
 #### T01.1 打开连接向导并选对驱动
 
@@ -86,7 +106,7 @@ R3 新建连接列表只有一个 **GaussDB** 入口，供 O/A/ORA 与 M 兼容�
 
 ![连接操作图示](./imgs/connection-driver.png)
 
-连接图 C02：新版新建连接列表只有一个 GaussDB 入口；图中三个图标属于历史界面，不按图中位置选择。旧驱动定义仍保留供已有连接使用，无需删除重建。
+连接图 C02：在搜索框输入 GaussDB，选中唯一的 **GaussDB** 图标，再点击右下角“下一步”。
 
 3. 驱动条目不会改变服务器已有数据库的兼容模式。目标库实际是否为 O/Oracle 模式，仍须在连接后查询确认。
 
@@ -99,13 +119,13 @@ R3 新建连接列表只有一个 **GaussDB** 入口，供 O/A/ORA 与 M 兼容�
 
 ![连接操作图示](./imgs/connection-driver-libraries.png)
 
-连接图 C03a：在“库”页使用右侧“添加文件”。左侧最终显示已添加的 gaussdbjdbc.jar；图中的本地目录仅为示例，客户使用自己保存官方 jar 的稳定目录。
+连接图 C03a：在编辑驱动的“库”页点击右侧“添加文件”，选择匹配的本地 `gsjdbc4.jar`。红色 `drivers/gaussdb/unified` 是可选占位路径，不是实际 JAR，可移除不用的路径。确认真实 JAR 已加入列表且目录长期保留，再用“测试连接”确认加载成功。
 
-5. 检查驱动类和 URL 协议。默认常用 `gsjdbc4.jar` 使用 `org.postgresql.Driver` 与 `jdbc:postgresql:`。若供应商 jar 实际使用 `com.huawei.gaussdb.jdbc.Driver`，则在高级驱动管理中配 `jdbc:gaussdb:`。按 jar 实际类名与协议配套，不因 O 库而强制换包；确认后返回连接主页。
+5. 检查驱动类和 URL 协议。默认常用 `gsjdbc4.jar` 使用 `org.postgresql.Driver` 与 `jdbc:postgresql:`。若供应商 jar 实际使用 `com.huawei.gaussdb.jdbc.Driver`，可在“设置”页更改实际驱动类；主机模式会据此生成 `jdbc:gaussdb:` 实际 URL。该驱动的 URL 模板只读，请返回“主要”页核对实际 URL。按 jar 实际类名与协议配套，不因 O 库而强制换包；确认后返回连接主页。
 
 ![连接操作图示](./imgs/connection-driver-settings.png)
 
-连接图 C03b：此历史截图展示 `com.huawei.gaussdb.jdbc.Driver` 与 `jdbc:gaussdb:` 的配套配置。新版默认 gsjdbc4 对应 `org.postgresql.Driver` 与 `jdbc:postgresql:`，不要只照抄图中类名；端口也以 DBA 提供值为准。
+连接图 C03b：在“设置”页核对驱动名称为 **GaussDB**，默认类名为 `org.postgresql.Driver`。返回连接“主要”页，确认实际 URL 以 `jdbc:postgresql:` 开头；端口以 DBA 提供值为准。
 
 驱动定义可能由多个已有连接共用。已有正常连接时，修改前记录其库列表和使用范围；需要并行使用不同版本时，为连接准备独立的驱动定义后再调整，不直接替换所有连接共用的 jar。
 
@@ -124,7 +144,7 @@ R3 新建连接列表只有一个 **GaussDB** 入口，供 O/A/ORA 与 M 兼容�
 
 ![连接操作图示](./imgs/connection-fields.png)
 
-连接图 C04a：在“主要”页填写主机、端口、数据库、用户名和密码。示例未勾选“保存密码”；左下为“测试连接”，右下为“完成”及“编辑驱动设置”等入口。
+连接图 C04a：在“主要”页填写主机、端口、数据库、用户名和密码。O/A/ORA 库保持 M 兼容选项不勾选；“保存密码”按组织要求选择。左下为“测试连接”，右下为“完成”和“编辑驱动设置”。
 
 如果 DBA 要求 SSL/TLS，请先在连接的 SSL 设置中按要求配置模式、CA 或客户端证书，再测试连接。不能因为演示截图未展开 SSL 页，就推断客户环境不需要 SSL；遇到证书错误时也不要直接关闭校验来取得“成功”。其他高级参数保持原配置，除非 DBA 提供了明确要求。
 
@@ -142,27 +162,27 @@ R3 新建连接列表只有一个 **GaussDB** 入口，供 O/A/ORA 与 M 兼容�
 
 连接图 C05：“已连接”表示本次测试成功。服务器完整版本还应通过 SQL 查询确认；驱动版本如不能识别，保留原文并核对官方 jar 信息。关闭此窗口后还需点击连接向导的“完成”。
 
-3. 点击 **完成/Finish** 保存连接。若随后再次提示输入密码，按刚才的密码保存选择处理；不要为消除提示而更改服务器认证。 如需设置便于识别的连接显示名，可用主页右下的“连接详情（名称、类型…）”；本例显示名为“GaussDB O 模式演示”，显示名不会改变数据库的兼容模式。
+3. 点击 **完成/Finish** 保存连接。若随后再次提示输入密码，按刚才的密码保存选择处理；不要为消除提示而更改服务器认证。 如需设置便于识别的连接显示名，可用主页右下的“连接详情（名称、类型…）”；显示名不会改变数据库的兼容模式。
 4. 在数据库导航器展开刚创建的连接 → 数据库（如显示）→ 模式/Schemas → 目标 schema。若能连接但看不到对象，先核对数据库、schema、权限和导航过滤器；空列表不一定表示数据库没有对象。
 
 ![连接操作图示](./imgs/connection-navigation.png)
 
-连接图 C06：已完成并展开演示连接，定位到数据库 dbv_connect_20261105 → 模式 → manual_demo → 表 → connection_check。客户应展开自己的目标库与 schema。
+连接图 C06：已完成并展开演示连接，定位到数据库 dbv_current_20261105 → 模式 → manual_demo → 表 → sample_orders。客户应展开自己的目标库、schema 和测试对象。
 
 #### T01.5 打开 SQL 编辑器核对实际目标
 
-1. 在数据库导航器中**右键刚创建的连接**，选择 **SQL 编辑器 → 新建 SQL 编辑器**。
+1. 在数据库导航器中选中刚创建的连接，点击顶部菜单 **SQL 编辑器 → 新建 SQL 编辑器**。
 
 ![连接操作图示](./imgs/connection-sql-menu.png)
 
-连接图 C07：右键连接，进入“SQL 编辑器”子菜单，点击“新建 SQL 编辑器”。不要误选只会打开已有编辑器的其他条目。
+连接图 C07：选中连接后，打开顶部“SQL 编辑器”菜单，点击“新建 SQL 编辑器”。不要误选只会打开已有编辑器的其他条目。
 
 2. 确认编辑器顶部绑定的是该连接和目标数据库，再逐条执行以下查询。每次把光标放在待执行语句中，使用菜单 **执行 SQL 语句** 或界面显示的对应快捷键，不把三个结果混成同一项检查。
 
 ```sql
 SELECT version() AS server_version;
-SELECT current_database() AS database_name, current_user AS user_name;
-SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
+SELECT current_database() AS database_name, current_user AS username;
+SELECT setting AS sql_compatibility FROM pg_catalog.pg_settings WHERE name = 'sql_compatibility';
 ```
 
 3. 在下方结果页分别记录服务器完整版本、当前数据库、当前用户和 `sql_compatibility`。O 模式名称在不同版本可能呈现为 O/A/ORA，不凭连接显示名称中的“Oracle”判断。
@@ -173,11 +193,11 @@ SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
 
 ![连接操作图示](./imgs/connection-context.png)
 
-连接图 C08b：数据库名与当前用户分别显示在 database_name、user_name 列。示例二者同名，实际环境不要求相同，须分别核对。
+连接图 C08b：数据库名与当前用户分别显示在 database_name、username 列，逐项与 DBA 提供的信息核对。二者不要求相同。
 
 ![连接操作图示](./imgs/connection-mode.png)
 
-连接图 C08c：sql_compatibility 的 setting 返回 A，表示本演示库处于 Oracle 兼容模式；以实际查询值和 DBA 确认为准。
+连接图 C08c：sql_compatibility 列返回 A，表示本演示库处于 Oracle 兼容模式；以实际查询值和 DBA 确认为准。
 
 4. 如果查询失败或兼容模式没有返回结果，保留原始错误和结果，请 DBA 核对目标版本与模式。连接测试成功只证明本次连接建立成功，不等于已经具备 PL/SQL 调试角色、Package 权限或全部对象访问权限。
 
@@ -456,7 +476,7 @@ GROUP BY value ORDER BY value;
 
 例如过程先插入 `901`、执行 `COMMIT`，再插入 `902`：结束前，调试连接可看到两行，独立连接只能看到已提交的 `901`；选择“回滚剩余事务并结束”后，`902` 被回滚，`901` 仍然存在。本轮已在通过转译运行的麒麟 V10 x86_64 容器连接 GaussDB 507 ORA 真库，完成 DBeaver 图形界面及 JDBC 调试链路验证；GUI 选择回滚前后，独立连接查询均为 `901` 一行、`902` 零行。
 
-客户端不能自动识别本次过程执行过哪些历史 `COMMIT`。即使过程最后一行是 `COMMIT`，驱动随后仍可能报告事务为 `OPEN`，因此仍可能出现剩余事务处理窗口；不能用弹窗是否出现判断过程有没有提交。以上 `ui_parent`/`ui_child` 最小例子不含内部 `COMMIT`，其 T10/T11 预期只适用于这份示例。
+客户端不能自动识别本次过程已经执行过哪些 `COMMIT`。即使过程最后一行是 `COMMIT`，驱动随后仍可能报告事务为 `OPEN`，因此仍可能出现剩余事务处理窗口；不能用弹窗是否出现判断过程有没有提交。以上 `ui_parent`/`ui_child` 最小例子不含内部 `COMMIT`，其 T10/T11 预期只适用于这份示例。
 
 ![调试结束后的提交或回滚选择](./imgs/debug-transaction-choice.png)
 
@@ -577,7 +597,7 @@ END manual_pkg_second;
 | 现象 | 先检查什么 | 不要做什么 |
 | --- | --- | --- |
 | 顶部没有数据库调试 | Help → Show Product Configuration → Procedure debugger；打开具体过程对象源码并激活 | 不要把普通 SQL 脚本当作调试对象 |
-| 新建配置提示 No tab group defined | 关闭“运行配置”，改从“数据库 → 数据库调试”或小虫下拉“数据库调试配置”进入；核对当前构建并更新到本页版本 | 不要删除工作区；“运行配置”用于其他启动类型 |
+| 需要新建数据库调试配置 | 从“数据库 → 数据库调试”或小虫下拉“数据库调试配置”进入 | “运行配置”用于其他启动类型；普通 SQL 在 SQL 编辑器中执行 |
 | 功能已开仍无入口 | 当前连接是否 GaussDB、是否 O 库、过程语言是否可调试；产品功能是否限制数据库开发权限 | 不要在 M 库强开 PL 调试 |
 | 配置无 GaussDB routine | 选中的数据源类型和四个 GaussDB 插件是否齐全 | 不要安装 PG 调试器代替 GaussDB 协议 |
 | 找不到 Procedure debugger 配置向导 | Ctrl+3 搜索 Show Product Configuration；核对“关于”中的当前构建，并在安装详情中检查 GaussDB 调试插件状态 | 不要把缺失菜单直接归因于服务端权限 |
@@ -624,12 +644,12 @@ JDBC 驱动版本：
 
 ## 14. 已验证与待现场验收的边界
 
-Linux GUI 与 GaussDB 507 已有断点重复启停、首次跨 schema 导航、事务回滚和复杂包脚本等专项证据；历史版本还完成过 GaussDB 505.2.1.SPC0800 分布式与集中式 JDBC 真库回归；本次 R3 分区修复的真库验证为 GaussDB 507 集中式 ORA。上述结果不能替代客户业务 SQL、桌面云键盘转发、503 系列或 Windows 实机验证。
+本版 x86_64 和 ARM64 客户端已在麒麟 V10 容器中连接 GaussDB 507，检查统一连接入口、A/M 连接、M 参数保存与重新打开，以及集中式 ORA 库的分区和子分区展示、刷新。本轮不声明已完成 GaussDB 505、503、分布式部署或 Windows 实机的全面验收；客户业务 SQL、桌面云键盘转发及目标操作系统仍须按实际环境验收。
 
 本说明书用于指导使用和现场功能检查，不替代客户目标环境的验收报告。原生 gs_dump/gs_restore 不属于原始七项，也不随本包内置；如需使用，应另按平台准备匹配的原生工具。
 
-本次游标状态增强在 GaussDB 507 ORA 真库验证了打开、FETCH 命中与耗尽、关闭、多游标及嵌套帧隔离；旧版按名称返回隐藏属性的格式使用单元测试夹具验证，不能代替 505 目标版本的真库验收。
+游标调试窗口显示服务端返回的游标名称和打开、命中、行计数等状态；不提供结果行、原 SQL 或列结构预览。不同数据库版本的状态返回格式及权限可能不同，应在目标服务器上确认，不以客户端界面存在该入口代替服务端能力验证。
 
-本次对象类型入参在通过转译运行的麒麟 V10 x86_64 容器连接 GaussDB 507 ORA 真库，完成了显式复合类型 `(id integer, name varchar(80))` 的 `(1,张三)`、`(2,"Alice, Jr.")` 与整个对象 SQL NULL 三种 GUI 输入流程及独立数据核对。SQL NULL 字段的调试摘要存在上述展示限制；这不等于匿名 record、任意对象、嵌套类型、JSON/JSONB 或数组的 GUI 支持已验收。
+本手册的对象参数操作限于显式复合类型 `(id integer, name varchar(80))` 的 `(1,张三)`、`(2,"Alice, Jr.")` 及整个对象 SQL NULL。SQL NULL 字段的调试摘要存在上述展示限制；匿名 record、任意对象、嵌套类型、JSON/JSONB、数组和其他用户定义类型不在本手册的通用验收承诺内。
 
-核对依据：GaussDB/debug.ui 菜单注册、产品配置向导、参数面板、包编译命令、中文资源及仓库内可重复执行的自动化测试。历史旧包地址和旧分支说明不作为本版本依据。
+使用时以本版界面、发布清单和目标服务器实际能力为准。调试要求匹配的 DBE_PLDEBUGGER 接口及权限；Package 编译、诊断和错误定位要求目标服务器支持相应功能。

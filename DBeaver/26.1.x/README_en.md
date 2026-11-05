@@ -26,7 +26,7 @@ Source baselines:
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
 - [Illustrated GUI operation manual (Chinese)](./GAUSSDB_GUI_OPERATION_MANUAL.md)
-- [Detailed V1.10 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+- [Detailed V1.11 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 - [Source components and revisions](./SOURCE-REVISIONS.json)
 
 ## 2. Scope
@@ -35,7 +35,7 @@ Source baselines:
 | --- | --- |
 | Client version | DBeaver 26.1.5 GaussDB Enhanced Edition |
 | Client platform | Kylin V10 x86_64 and ARM64/aarch64, with separate architecture-specific archives |
-| Validated database | This partition and refresh check: centralized GaussDB 507 ORA; historical centralized/distributed 505 records are listed in section 9 |
+| Validated database | Real GaussDB 507 A/M connections; partition and refresh checks use centralized 507 ORA. See section 9 for scope |
 | Compatibility modes | Detects ORA/A, MYSQL/B, TD/C, PG, and M; features are enabled according to server capabilities |
 | PL/SQL debugging | Enabled when the server provides the required `DBE_PLDEBUGGER` signatures and the current user has permission |
 | Package management | Full capability is intended for Package-capable centralized ORA deployments; other deployments use capability-based fallback behavior |
@@ -54,9 +54,9 @@ This ecosystem release provides clients for both architectures, matching product
 - [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-20261105-r3)
 - [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/SHA256SUMS)
 - [Complete enhanced source, including matching dbeaver-common](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
-- [V1.10 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+- [V1.11 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 
-The standalone Word asset has an ASCII filename for download compatibility and Chinese content. The client archive retains the Chinese filename. Word is updated to V1.10 with R3 download links and illustrated partition instructions. The online steps and screenshots for both architectures are in section 8 of this guide.
+The standalone Word asset has an ASCII filename for download compatibility and Chinese content. The client archive retains the Chinese filename. Word is updated to V1.11 with current unified-connection workflow, driver-class and JDBC-option screenshots, and illustrated partition instructions. The online steps and screenshots for both architectures are in section 8 of this guide.
 
 For installation, download the appropriate client and use the online or Word guide. Download the complete source archive when building or reviewing the implementation.
 
@@ -112,7 +112,7 @@ Complete the connection before starting routine or Package debugging. See the [o
 
 1. Obtain the reachable server host, port, database name, account, and compatibility mode from the database administrator. The host is a database endpoint, not the client extraction directory.
 2. Open **Database → New Database Connection**, or the new-connection toolbar action, and select the single **GaussDB** entry for both O/A/ORA and M databases. Add the matching JDBC JAR as described below.
-3. Enter the connection details. For M databases, select **M compatibility: mCompatible=true, yearIsDateType=true**; leave it cleared for A/O databases. This sets JDBC properties for this connection and does not change the database compatibility mode. Run **Test Connection**, finish the wizard, and confirm that the connection expands in **Database Navigator**.
+3. Enter the connection details. For M databases, select **M compatibility: mCompatible=true, yearIsDateType=true**; leave it cleared for A/O databases. This sets JDBC properties for this connection and does not change the database compatibility mode. Omit `mCompatible` and `yearIsDateType` from URL query strings; the page reports a conflict and prevents connecting until they are removed. Run **Test Connection**, finish the wizard, and confirm that the connection expands in **Database Navigator**.
 4. Expand the database and schema, check the tables and supported routines or packages, then follow sections 6 and 7 for debugging and compilation.
 
 
@@ -135,6 +135,18 @@ The unified new-connection picker, with legacy definitions retained for saved co
 
 ![The new-connection picker shows one GaussDB entry](./imgs/new-connection-gaussdb.png)
 
+Select the explicit M option on the main connection page for M databases; leave it cleared for A/O databases:
+
+![Explicit M compatibility options on the main connection page](./imgs/connection-m-options.png)
+
+Choose **Edit Driver Settings** to verify the driver class. In host mode, return to the main page to confirm the generated JDBC URL:
+
+![Driver class and URL template](./imgs/connection-driver-class.png)
+
+The connection's **Driver properties** page shows the effective JDBC options; `mCompatible=true` corresponds to the selected M checkbox:
+
+![JDBC properties for this connection](./imgs/connection-driver-properties.png)
+
 ## 6. Debug a stored procedure or function
 
 ### 6.1 Start a debug session
@@ -152,7 +164,7 @@ To pass SQL NULL for the entire parameter, select SQL NULL in the input-mode col
 
 ![Composite argument fields after suspension](./imgs/object-parameter-debug.png)
 
-The generic **Run** > **Run Configurations...** menu remains available for other launch types; the database debug type is offered only in **Debug Configurations**. Execute ordinary SQL in the SQL editor. If an older build reports `No tab group defined` when creating an entry in **Run Configurations**, close that dialog, use the database debug entry above, and update to this build. Do not delete the workspace.
+The generic **Run** > **Run Configurations...** menu remains available for other launch types; the database debug type is offered only in **Debug Configurations**. Execute ordinary SQL in the SQL editor.
 
 ![Debug source and breakpoint](./imgs/debug-source.png)
 
@@ -202,7 +214,7 @@ Package member debugging requires a transaction-scoped `SET LOCAL search_path`. 
 
 The **Breakpoints** view retains configured breakpoints for the entire workspace after a session ends or the client restarts. It is not a log of breakpoint hits in the current execution. One connection can contain different databases, routines and lines, so identical connection labels do not by themselves indicate duplicates. Multiple records with the same connection, database, routine OID and line are duplicates.
 
-Breakpoint labels include the connection identity, including when a custom label is used. Toggling a breakpoint at the same source line removes all matching duplicate records while preserving other connections. The client does not clear historical breakpoints automatically. Select unused breakpoints in the **Breakpoints** view to remove them, or uncheck them to disable them.
+Breakpoint labels include the connection identity, including when a custom label is used. Toggling a breakpoint at the same source line removes all matching duplicate records while preserving other connections. The client does not clear saved breakpoints automatically. Select unused breakpoints in the **Breakpoints** view to remove them, or uncheck them to disable them.
 
 In **Breakpoints**, a single click selects a breakpoint; double-click to open its source and navigate to the breakpoint line. Merely switching to the Breakpoints or another view tab does not open source automatically. On initial or slow loading, execution-line and instruction-pointer positioning waits until the source document has loaded. After a source tab is closed or another view is selected, outdated asynchronous source results are ignored so the tab is not reopened and focus is not taken back.
 
@@ -274,64 +286,17 @@ The same operation in the Kylin V10 ARM64 container:
 | Same connection with cached children: add a subpartition, F5 changes tree and list from 2 to 3 | Passed | Passed |
 | Drop that subpartition, F5 returns tree and list from 3 to 2 | Passed | Passed |
 
-The seven tables' actual metadata, property descriptors and boundaries match line for line. All 451 identically named shared JARs in the two products match byte for byte. ARM coverage in this round is the GUI and metadata smoke comparison above; it does not establish full ARM acceptance of all historical debugging, Package, or customer virtual-desktop scenarios.
-
-### 9.2 Historical validation records
-
-The following results retain their original build dates. Newly executed R3 checks are listed above; complete historical GUI suites, 505-server checks and other environments were not rerun in this round.
-
-Historical 2026-11-05 R2 was a connection-manual and source-delivery revision. Java plug-ins remain the R1 build; the R1 full-regression records below were not rerun for R2. Validation of the new connection walkthrough: A translated Kylin V10 x86_64 container connected to centralized 507 ORA using a fresh connection wizard, the native driver and a local JDBC jar; field entry, authentication without saved password, successful connection test, saved navigation, SQL queries confirming Kernel 507/current database/user/sql_compatibility=A, and the Error Log view were exercised. Thirteen complete-window screenshots were captured. The revised Word manual has 43 pages and 24 images, all visually checked.
-
-Validation of the 2026-11-05 R1 build:
-
-- Fix cross-schema composite argument calls by resolving the parameter's actual type OID and qualifying its owning schema. User-defined types no longer depend on the current search path; built-in type formatting is preserved.
-- The completion dialog explains that only the remaining transaction is affected, prior commits inside the routine cannot be rolled back, and source code is not saved. Rollback remains the default.
-- Main regression: 3,137 cases, with 2,953 passed, 184 conditionally skipped, zero failures or errors; seven regression cases were added since R6. All 204 product build modules succeeded. Fresh extraction passed all 1202 inventory entries, and 6 key production plugins byte-match the tested GUI copy.
-- Centralized 507 ORA GUI checks: a Kylin V10 x86_64 container running through Rosetta/instruction translation and sharing the LinuxKit kernel debugged `(1,张三)` and `(2,"Alice, Jr.")`, paused, and displayed their fields correctly. After an actual commit, an independent connection read back the expected input values.
-- SQL NULL and internal-COMMIT verification: A whole-object SQL NULL argument launched and completed successfully; an independent connection confirmed one committed row for each composite example and one SQL NULL row. On 507, `info_locals()` can display NULL composite fields as `0/<UNKNOWN>`; these placeholders are not claimed as exact field values. The internal-COMMIT scenario inserted 901 and committed, then inserted 902. Final rollback preserved 901, removed the uncommitted 902, and left no live debug target or process.
-
-The following R6 and earlier results are historical records; their complete suites were not rerun for this build:
-
-Validation of the 2026-11-03 R6 build:
-
-- R6 cursor state: supports the inline state text returned by 507 `info_locals()` and the older name-based hidden-attribute format. Attributes are matched by complete cursor name, Package, and frame; missing, invalid, duplicate, or conflicting data is preserved rather than guessed. Cursor summaries and children are read-only; watches support the cursor and its `%ISOPEN`, `%FOUND`, `%NOTFOUND`, and `%ROWCOUNT` attributes.
-- R6 watch refresh: retains stable variable and attribute snapshot identities. Suspension creates missing debug views without activating Variables or Breakpoints, preserving the visible Expressions tab.
-- R6 main regression: 3,130 cases, with 2,946 passed, 184 conditionally skipped, zero failures or errors; this build adds 87 regression cases.
-- R6 live protocol checks: centralized 507 ORA, covering OPEN, successful and unsuccessful FETCH, CLOSE, multiple cursors, and frame switching; 86 assertions per round, repeated twice with both rounds passing. The older name-based hidden format is unit-tested against supplied protocol fixtures; this release does not claim a new 505-server validation of that format.
-- R6 product build and GUI acceptance: All 204 Maven modules built successfully. The final R6 GUI ran in a translated Kylin V10 x86_64 container with a fresh workspace connected to centralized 507 ORA. The real Variables and Expressions views refreshed the cursor and cur%ROWCOUNT watch after OPEN, the first and second FETCH, exhaustion with NOTFOUND, and CLOSE. Both views expanded all four state attributes and NAME with read-only protection. The selected frame, source caret, and execution annotation aligned at line 10. F9 completed normally; rollback left no live debug target or process, and the client exited normally. The six production bundles match the final GUI copy byte for byte; the extracted archive passed all 1,202 manifest entries. Same-frame cursor isolation and ambiguity across Packages are unit-tested; this combination is not claimed as GUI-validated.
-
-The R5, R4, R3, and R2 entries below are historical records; their complete suites were not rerun with R6:
-
-- R5 fixes debug completion state synchronization. Continue and stepping synchronize target and thread running states and clear stale stack frames; the next suspension reads a fresh stack. Resume is disabled while commit/rollback is pending, and outdated queued resume actions are ignored, preventing completed sessions from being treated as resumable paused sessions.
-- R5 fixes completion detection during Package stepping. An independent JDBC protocol probe against a live 507 server found that reaching a child routine END can return `[EXECUTION FINISHED]` while child and caller frames remain. The client now matches the marker exactly and reads the backtrace on the same controller connection; a remaining stack is treated as a pause. It does not infer completion from routine OIDs, which may repeat in recursion. Routine completion requires the target CALL to return successfully; only the expected `D0005` backtrace state is treated as a completion signal, and other errors remain visible. This server behavior was confirmed by an independent protocol probe and the revised-client GUI checks below.
-- R5 matches error-response markers exactly, so similar text inside source strings or comments is not mistaken for a debug failure. Genuine server error markers still terminate the debug session and report the error.
-- R5 main regression: 3,043 total, 2,859 passed, 184 conditionally skipped, zero failures or errors; this build adds 45 regression cases (19 model-state and race cases, and 26 completion/error-marker cases). The R4, R3 and R2 GUI checks below are historical results and were not rerun with R5.
-- R5 live GUI checks: a translated Kylin V10 x86_64 container connected to centralized GaussDB 507 ORA. R4 reproduced a completed state with two stack frames still present, followed by `not suspended` on Continue. In R5, F7 entered run_demo → build_result → calc_amount, crossed the server-reported build_result line 0, returned to run_demo line 8, and stepped to normal completion. A second run remained resumable and incomplete at build_result line 0; clicking Continue completed normally.
-- R5 transaction checks: Resume and stepping actions were disabled while the final commit/rollback dialog was displayed. After the first run committed, an independent connection read one row. The second run rolled back, and the independent row count remained one.
-- R5 product build: 204/204 Maven modules succeeded. The six production bundles involved in the repair are byte-identical to those used for GUI acceptance.
-
-- R4 product build: 204/204 Maven modules succeeded. The extracted release archive passed manifest verification for 1,202 entries; the six production bundles involved in the repair match the GUI acceptance copy.
-- Historical R4 main regression: 2,998 total, 2,814 passed, 184 conditionally skipped, zero failures or errors; R4 added 29 regression cases and retained the 69 cases added in R3.
-- R4 live GUI checks preserve a real R3 workspace breakpoint across the version restart. Single-click selects without opening an editor. Cold double-click, double-click while the object is on Properties, and the Go to File context action all navigate to source line 6. An injected eight-second source-query delay still ends at line 6. Repeated single-clicks after closing all editors do not reopen source.
-- R4 launch checks: Run Configurations lists only other runnable types. The saved database configuration in Debug Configurations remains valid with Debug enabled. An actual run_demo Package launch pauses with both caret and execution annotation at line 6, then continues to completion with rollback selected.
-- R3 live GUI checks: explicit per-launch Package acknowledgement; declining leaves no live debug targets or processes. Initial suspend, double-click reopening and three-level F7 navigation place both caret and execution annotation at lines 6, 4 and 6. Closing source or using a native mouse click to return to Breakpoints remains stable for 10 seconds without reopening or focus theft.
-- Previously completed in R2: Kylin V10 x86_64 GUI connected to a local centralized GaussDB 507 server: 100 bulk schemas, approximately 15,000 procedures, 3,000 functions, 208 packages and 3,900 synthetic composite types in the database.
-- Previously completed in R2: each of two JDBC drivers completed three refresh rounds, with 500 tasks and 12 worker threads per round. The driver concurrency exception reproduced with the previous build did not recur.
-- Previously completed in R2: M-mode main and metadata connection initialization, table data reading and debug parameter panel creation passed.
-- R2 adds 23 regression cases. GUI checks cover restored duplicate breakpoints across restart, removing matches while preserving another connection, selecting run_demo in a new configuration, F7 into build_result and calc_amount with three frames, frame-specific variables and correct source, and F8 producing amount 30. Commit adds a row; a subsequent rollback leaves the row count unchanged.
-- R4 and R3 GUI validation used a Rosetta-translated Kylin V10 x86_64 container on Apple Silicon and a centralized 507 ORA server. R2 previously checked a 505 JDBC driver against that server. These checks do not constitute 505 server or native x86 virtual-desktop acceptance.
-
-The 2026-10-14 baseline previously passed centralized and distributed 505 live-database and independent acceptance checks. That full historical suite was not rerun for this repair build. Persistent loading in a target environment still needs an upgrade retest to establish whether its cause matches the repaired driver concurrency exception.
+The seven tables' actual metadata, property descriptors and boundaries match line for line. All 451 identically named shared JARs in the two products match byte for byte. ARM coverage in this round is the GUI and metadata smoke comparison above; it does not establish full ARM acceptance of all debugging, Package, or customer virtual-desktop scenarios.
 
 ## 10. Current boundaries
 
 - This release provides Kylin V10 x86_64 and ARM64/aarch64 packages. Windows and macOS packages were not built and accepted in this round.
-- Historical object-parameter GUI coverage is limited to the composite examples above; it does not establish acceptance for every object, array or domain type. ARM coverage in this round is limited to section 9.1. Neither container comparison replaces acceptance on customer hardware, a native Kylin kernel or a virtual desktop.
+- Object-parameter guidance covers the composite examples above; it does not establish acceptance for every object, array or domain type. ARM coverage in this round is listed in section 9.1. Neither container comparison replaces acceptance on customer hardware, a native Kylin kernel or a virtual desktop.
 - Locally rebuilt Linux native libraries in the package are not digitally signed. Verify integrity with the published SHA-256 digest and product manifest.
 - GaussDB JDBC, `gs_dump`, `gs_restore`, and other native database tools are not distributed with the client.
 - PL/SQL debugging depends on server debug APIs, compatibility mode, routine language, and user permissions.
 - Package error navigation depends on Package and compilation-diagnostic capabilities in the target server version.
-- Paused local cursors expose server-supplied state only. Result rows, original SQL, and column-structure previews require a future server interface. The older name-based hidden format is covered by protocol-fixture unit tests; the historical live-server cursor coverage uses the 507 inline format.
+- Paused local cursors expose server-supplied state only. Result rows, original SQL, and column-structure previews require a future server interface. Confirm the returned format and required permissions on the target server version.
 - Before first use in a target environment, verify the digest and run organization-specific connection, debugging, transaction, and Package acceptance tests.
 
 ## 11. Build from the delivered source
@@ -353,7 +318,7 @@ mvn -f product/aggregate/pom.xml -Pproduct-dbeaver-ce package \
 
 The application qualifier is `20261105r3`, and the delivery revision is `20261105-r3`. `-DskipTests=true` packages the product without executing tests. Maven/P2 dependencies must be reachable or available in a complete, matching offline cache; downloading the source alone does not guarantee an automatic offline build.
 
-The command builds the Java/Eclipse product. Recreating the Kylin archive additionally requires matching native libraries, pinned SWT/Equinox sources, JRE, Node.js 22+, and assembly tools. See `product/community/kylin/README.zh-CN.md` and `THIRD-PARTY-SOURCES.md` in the source. Auditable source and platform build validation do not imply byte-identical rebuilds. Upstream and historical Markdown files remain source material; use the linked V1.10 manual for customer operations.
+The command builds the Java/Eclipse product. Recreating the Kylin archive additionally requires matching native libraries, pinned SWT/Equinox sources, JRE, Node.js 22+, and assembly tools. See `product/community/kylin/README.zh-CN.md` and `THIRD-PARTY-SOURCES.md` in the source. Auditable source and platform build validation do not imply byte-identical rebuilds. Use the linked V1.11 manual for customer operations and the bundled build instructions for source builds.
 
 ## 12. Licensing
 
