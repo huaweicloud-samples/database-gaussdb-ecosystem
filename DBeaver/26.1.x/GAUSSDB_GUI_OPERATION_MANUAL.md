@@ -2,11 +2,11 @@
 
 更新日期：2026-11-05。适用于数据库开发、测试及运维人员。本文可直接在代码仓库在线阅读，无需下载 HTML 文件。
 
-适用版本：DBeaver 26.1.5 GaussDB 适配版，应用构建 `26.1.5.20261105r1`，交付修订 `20261105-r2`。本轮补充连接指导和图示，文档版本为 V1.9；应用二进制构建保持不变。源码版本见发布页的构建清单；适用条件和验证范围见第 14 节。
+适用版本：DBeaver 26.1.5 GaussDB 适配版，应用构建 `26.1.5.20261105r3`，交付修订 `20261105-r3`。在线说明新增分区表与二级分区展示指引；独立 Word 手册 V1.10 同步更新连接、调试、Package 及分区操作指导。源码版本见发布页的构建清单；适用条件和验证范围见第 14 节。
 
-华为云生态仓发布页（完整地址）：https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2
+华为云生态仓发布页（完整地址）：https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-20261105-r3
 
-jarrenL 发布页（完整地址）：https://github.com/jarrenL/dbeaver/releases/tag/gaussdb-2615-x86_64-beta-20261105-r2
+完整增强源码请下载同一生态仓 Release 中显式命名的 `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz`，其中包含匹配的 `dbeaver-common`；GitHub 默认 Source code 链接对应生态仓文档树。
 
 **重要：PL/SQL 调试、包管理测 O/Oracle 兼容库；M 模式只测连接、对象浏览、SQL 和表数据操作。不要在 M 库找 PL/SQL 调试入口。** Package 基础能力要求服务端提供 `gs_package`。错误定位分为“服务端结构化精确诊断”和“已保存源码重放诊断”两级，是否可用由目标服务器实际能力决定；客户端不能使不支持 Package 的服务器突然支持 Package。
 
@@ -14,7 +14,7 @@ jarrenL 发布页（完整地址）：https://github.com/jarrenL/dbeaver/release
 
 ## 阅读导航
 
-建议按以下顺序使用：第 1 节找到调试入口 → 第 2～4 节完成环境和示例准备 → 第 5～9 节使用调试功能 → 第 10 节使用包管理。第 12 节用于排查入口缺失和启动问题。T01～T15 是可重复执行的功能检查编号。
+建议按以下顺序使用：第 1 节找到调试入口 → 第 2～4 节完成环境和示例准备 → 第 5～9 节使用调试功能 → 第 10 节使用包管理。第 12 节用于排查入口缺失和启动问题。T01～T16 是可重复执行的功能检查编号。
 
 ## 1. 找不到调试入口？先按这条最短路径操作
 
@@ -37,7 +37,7 @@ jarrenL 发布页（完整地址）：https://github.com/jarrenL/dbeaver/release
 DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 GaussDB 服务器；不要求安装到数据库服务器上。客户端不需要 Docker，也不需要 gdb。
 
 - 麒麟 x86_64：本次发布的 Linux tar.gz 文件名含 `linux-x86_64`，解压，进入 `dbeaver` 目录，双击 `dbeaver`，或终端执行 `./dbeaver`。
-- 麒麟 ARM64/aarch64：请在对应 Release 中选择文件名含 `linux-aarch64` 的 Linux tar.gz；本次发布只提供 x86_64，ARM 安装包以实际 Release 资产为准，操作步骤与 x86_64 相同。
+- 麒麟 ARM64/aarch64：请在对应 Release 中选择文件名含 `linux-aarch64` 的 Linux tar.gz；本次 Release 同时提供 x86_64 和 ARM64 两种包，操作步骤一致。
 - Windows x86_64：使用 setup.exe 或解压 ZIP，运行 `dbeaver.exe`。本版 Windows 包尚无实机 GUI 验收。
 - 安装包必须与 CPU 和操作系统匹配。`uname -m` 为 `aarch64` 时不能运行 Linux x86_64 包；Windows ARM64、macOS 和 LoongArch 安装包不在本次发布范围。
 - 包里自带 Java，不需要将系统 Java 替换掉；JDBC 驱动需客户或供应商提供。
@@ -46,7 +46,7 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 
 首次启动的配置向导，或 **帮助 → 产品配置... → 语言**，选择 **简体中文**，完成向导并点击“应用”，按提示重启；若又出现退出确认，请选择“是”。新版无需额外传入 `-nl`。关闭窗口后请等后台进程退出，不要立即打开第二个实例。
 
-![产品配置中的简体中文选项](imgs/language-config.png)
+![产品配置中的简体中文选项](./imgs/language-config.png)
 
 如需临时指定语言，可在程序目录执行 `./dbeaver -nl zh`（Windows 为 `dbeaver.exe -nl zh`）。安装器自身的显示语言与应用运行语言是两个设置；应用语言请在上述产品配置中选择。
 
@@ -70,19 +70,21 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 
 本节从尚未创建连接的客户端开始。先准备 DBA 提供的数据库主机地址、端口、数据库名、数据库用户名和密码、兼容模式，以及匹配的官方 JDBC jar；若要求 SSL/TLS，还需准备指定的连接方式和证书。连接服务器前，麒麟桌面必须能访问该地址与端口。数据库名、schema 名和桌面云登录账号是不同概念，不可互相代填。
 
+R3 新建连接列表保留 **GaussDB M** 和 **GaussDB 原生驱动**，旧的 **GaussDB** 入口隐藏；已有连接仍能按原驱动使用。部分历史截图仍显示旧入口。原生驱动要求 JAR 包含 `com.huawei.gaussdb.jdbc.Driver`，并使用 `jdbc:gaussdb:`；仅包含 `org.postgresql.Driver` 的旧 `gsjdbc4.jar` 不能直接套用原生配置；连接 M 库时应选择 M 专用项并使用匹配参数。文件名本身不能判断 JAR 是否包含原生驱动类。
+
 连接图 C01～C09 来自通过转译运行的麒麟 V10 x86_64 容器，实际连接 GaussDB 507 O/Oracle 兼容演示库。截图用于说明控件位置；`host.docker.internal:55452`、`dbv_connect_20261105` 和 `manual_demo` 是演示环境信息，请替换为 DBA 提供的实际地址、数据库、账号和 schema。
 
 #### T01.1 打开连接向导并选对驱动
 
 1. 在 DBeaver 顶部点击 **数据库 → 新建数据库连接**。这里创建的是客户端连接配置，不是在服务器创建数据库。
 
-![连接操作图示](imgs/connection-menu.png)
+![连接操作图示](./imgs/connection-menu.png)
 
 连接图 C01：打开顶部“数据库”菜单，选择“新建数据库连接”。也可使用界面显示的快捷键 Shift+Ctrl+N。
 
 2. 在驱动选择页搜索 `GaussDB`，O/Oracle 兼容库选择 **GaussDB 原生驱动（GaussDB Native）**，再点“下一步”。不要选择 PostgreSQL 或 Generic 代替本手册的专用驱动；GaussDB M 条目用于 M 兼容库，不用于本节的 O 模式 PL/SQL 调试。
 
-![连接操作图示](imgs/connection-driver.png)
+![连接操作图示](./imgs/connection-driver.png)
 
 连接图 C02：按名称选择“GaussDB 原生驱动（GaussDB Native）”，再点右下“下一步”。排序可能变化，不按第几个图标判断，也不把 M 兼容条目作为本节入口。
 
@@ -95,13 +97,13 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 3. 先检查库列表。GaussDB Native 不应混入 PostgreSQL 驱动 jar；同一驱动类的多个旧版本 jar 也可能导致加载错误版本。确认后，仅移除本驱动库列表中的冲突项或重复旧版，保留供应商明确要求的依赖。不要删除整个驱动定义或随意删除其他驱动的文件。
 4. 点击 **添加文件/Add File**，选中已准备的官方 GaussDB JDBC jar，确认后检查列表中出现了该文件。路径必须在后续启动时仍存在；不要把 jar 留在会自动清理的临时目录。
 
-![连接操作图示](imgs/connection-driver-libraries.png)
+![连接操作图示](./imgs/connection-driver-libraries.png)
 
 连接图 C03a：在“库”页使用右侧“添加文件”。左侧最终显示已添加的 gaussdbjdbc.jar；图中的本地目录仅为示例，客户使用自己保存官方 jar 的稳定目录。
 
 5. 检查驱动类和 URL 协议。GaussDB Native 对应 `com.huawei.gaussdb.jdbc.Driver` 和 `jdbc:gaussdb:`。不能只把 PostgreSQL jar 的显示名称改成 GaussDB 来代替。确认驱动设置后返回连接主页。
 
-![连接操作图示](imgs/connection-driver-settings.png)
+![连接操作图示](./imgs/connection-driver-settings.png)
 
 连接图 C03b：切换顶部“设置”页，核对“类名”为 com.huawei.gaussdb.jdbc.Driver，URL 模板使用 jdbc:gaussdb:。默认端口不代表客户数据库的实际端口。
 
@@ -120,7 +122,7 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 | 密码/Password | 对应该数据库账号的密码；注意大小写和输入法，保持密码掩码显示 |
 | 保存密码/Save password | 按企业安全策略决定是否勾选；不保存时，后续连接按提示重新输入。保存密码不是修改数据库密码 |
 
-![连接操作图示](imgs/connection-fields.png)
+![连接操作图示](./imgs/connection-fields.png)
 
 连接图 C04a：在“主要”页填写主机、端口、数据库、用户名和密码。示例未勾选“保存密码”；左下为“测试连接”，右下为“完成”及“编辑驱动设置”等入口。
 
@@ -130,20 +132,20 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 
 1. 点击连接主页的 **测试连接/Test Connection**，等待结果。测试或展开连接时若出现“身份验证”窗口，输入数据库账号和密码，再点“确定”；未保存密码时，再次提示输入属于正常流程。
 
-![连接操作图示](imgs/connection-authentication.png)
+![连接操作图示](./imgs/connection-authentication.png)
 
 连接图 C04b：未保存密码时可能出现此身份验证窗口。输入数据库凭据后点“确定”，不要填写桌面云登录账号；密码保持掩码。
 
 2. 成功对话框应显示“已连接”、服务器信息和驱动名称。核对后点击“确定”关闭结果框；服务器内核完整版本以后面的 `SELECT version()` 结果为准。若驱动版本文字无法识别，记录原文并核对官方 jar 的版本说明，不把该文本当作客户端版本。测试失败时，先按本节末尾排查，不把“已经创建配置”当作“数据库连接成功”。
 
-![连接操作图示](imgs/connection-success.png)
+![连接操作图示](./imgs/connection-success.png)
 
 连接图 C05：“已连接”表示本次测试成功。服务器完整版本还应通过 SQL 查询确认；驱动版本如不能识别，保留原文并核对官方 jar 信息。关闭此窗口后还需点击连接向导的“完成”。
 
 3. 点击 **完成/Finish** 保存连接。若随后再次提示输入密码，按刚才的密码保存选择处理；不要为消除提示而更改服务器认证。 如需设置便于识别的连接显示名，可用主页右下的“连接详情（名称、类型…）”；本例显示名为“GaussDB O 模式演示”，显示名不会改变数据库的兼容模式。
 4. 在数据库导航器展开刚创建的连接 → 数据库（如显示）→ 模式/Schemas → 目标 schema。若能连接但看不到对象，先核对数据库、schema、权限和导航过滤器；空列表不一定表示数据库没有对象。
 
-![连接操作图示](imgs/connection-navigation.png)
+![连接操作图示](./imgs/connection-navigation.png)
 
 连接图 C06：已完成并展开演示连接，定位到数据库 dbv_connect_20261105 → 模式 → manual_demo → 表 → connection_check。客户应展开自己的目标库与 schema。
 
@@ -151,7 +153,7 @@ DBeaver 安装在用户登录使用的麒麟图形桌面云里，连接远端 Ga
 
 1. 在数据库导航器中**右键刚创建的连接**，选择 **SQL 编辑器 → 新建 SQL 编辑器**。
 
-![连接操作图示](imgs/connection-sql-menu.png)
+![连接操作图示](./imgs/connection-sql-menu.png)
 
 连接图 C07：右键连接，进入“SQL 编辑器”子菜单，点击“新建 SQL 编辑器”。不要误选只会打开已有编辑器的其他条目。
 
@@ -165,15 +167,15 @@ SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
 
 3. 在下方结果页分别记录服务器完整版本、当前数据库、当前用户和 `sql_compatibility`。O 模式名称在不同版本可能呈现为 O/A/ORA，不凭连接显示名称中的“Oracle”判断。
 
-![连接操作图示](imgs/connection-version.png)
+![连接操作图示](./imgs/connection-version.png)
 
 连接图 C08a：版本查询得到完整 GaussDB Kernel 507.0.0 信息，结果位于下方表格；需要时选中单元格，在右侧数值查看器阅读完整文本。
 
-![连接操作图示](imgs/connection-context.png)
+![连接操作图示](./imgs/connection-context.png)
 
 连接图 C08b：数据库名与当前用户分别显示在 database_name、user_name 列。示例二者同名，实际环境不要求相同，须分别核对。
 
-![连接操作图示](imgs/connection-mode.png)
+![连接操作图示](./imgs/connection-mode.png)
 
 连接图 C08c：sql_compatibility 的 setting 返回 A，表示本演示库处于 Oracle 兼容模式；以实际查询值和 DBA 确认为准。
 
@@ -196,7 +198,7 @@ SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
 
 需要进一步排查时，在 **窗口 → 显示视图 → 其他** 中搜索 **错误日志/Error Log**，打开后选中对应时间的记录，查看并复制详细信息。日志用于保留客户端异常，不等于数据库服务器审计日志；服务器端认证或网络原因仍需 DBA 配合确认。
 
-![连接操作图示](imgs/connection-error-log.png)
+![连接操作图示](./imgs/connection-error-log.png)
 
 连接图 C09：底部“错误日志”窗格用于查看工作空间异常。本图当前没有错误记录，仅示意窗格位置；故障时按发生时间选择对应记录，查看详细信息。
 
@@ -210,6 +212,24 @@ SELECT name, setting FROM pg_settings WHERE name = 'sql_compatibility';
 4. 断开后重连，复查对象与数据。
 
 预期：基础开发工作流可用。M 库 PL/SQL 调试和包功能应受限，此限制不是未完成的调试用例。不要把不可用项填写为“调试通过”。
+
+### T16：查看分区表与二级分区
+
+1. 在导航树展开 **连接 → 数据库 → 模式 → 目标 Schema → 表**，双击分区表。
+2. 进入 **属性** 页，上方“分区依据”显示策略与真实列名，例如 `RANGE (id)`；下方左侧选择 **分区**，查看分区名称、分区表达式与边界。
+3. 对二级分区表，在导航树继续展开 **表名 → 分区 → 一级分区 → 子分区**。双击一级分区时，右侧属性页显示其对子表的分区策略，例如 `LIST (region)`；左侧 **子分区** 列表显示下一层名称和边界。
+4. 叶子分区没有下一级“子分区”入口。表格较窄时可关闭右侧 Chat 等视图，或横向滚动查看“分区表达式”列。
+5. 数据库中新增或删除分区后，选中对应的父分区按 **F5** 刷新，确认导航树和已打开的子分区列表同步更新；无需重新创建连接。
+
+下图来自麒麟 V10 x86_64 容器的实际客户端：
+
+![x86_64 二级分区导航与列表](./imgs/partition-x86_64-expanded.png)
+
+同一数据库在麒麟 V10 ARM64 容器的实际客户端：
+
+![ARM64 二级分区导航与列表](./imgs/partition-aarch64-expanded.png)
+
+R3 本轮验证覆盖 RANGE、LIST、HASH、INTERVAL、带引号的分区列名、普通表与两级分区；保持原连接，新增后 F5 从两项变三项、删除后 F5 恢复两项，两个架构均通过。数据库为 GaussDB 507 集中式 ORA。x86_64 容器通过指令转译运行，两种容器均共享宿主 Linux 内核；这些结果不等于目标物理机或桌面云的最终验收，也不表示全部调试回归用例均在 ARM 上重跑。
 
 ## 4. 准备一个可重复调试的最小例子（T03）
 
@@ -260,7 +280,7 @@ END;
 3. 源码区应显示该对象完整的 `CREATE OR REPLACE PROCEDURE ...` 定义。修改源码，按 **Ctrl+S**，检查待执行的保存 SQL 后确认；保存成功后刷新或重新打开，确认数据库中定义已更新。
 4. 若要验证修改后的行为，重新启动调试。保存失败时保留数据库错误，修正源码后再保存，不把编辑器里的未保存文本当作已编译定义。
 
-![普通存储过程对象源码入口与源标签](imgs/routine-source-entry.png)
+![普通存储过程对象源码入口与源标签](./imgs/routine-source-entry.png)
 
 普通源码入口图：左侧红框标出导航树中的具体过程，右侧红框标出“源”。图中 `qa_objects.object_demo` 是演示对象，使用时替换为实际 schema 和过程名。修改源码的保存操作与调试结束时的剩余数据事务处理是两件事。
 
@@ -293,11 +313,11 @@ END;
 
 GaussDB 507 的 `info_locals` 在整个复合对象为 SQL NULL 时，字段摘要可能显示数值 `0` 或字符 `<UNKNOWN>`。不要把这些调试展示当作实际业务值；本轮 SQL NULL 场景通过独立连接的 `id IS NULL`、`name IS NULL` 查询确认了实际入库结果。普通值和含逗号文本同时核对暂停时的接收变量及提交后的独立查询结果。
 
-![复合类型参数进入存储过程后的字段验证](imgs/object-parameter-debug.png)
+![复合类型参数进入存储过程后的字段验证](./imgs/object-parameter-debug.png)
 
 对象入参示例图：`(1,张三)` 进入过程后，变量窗格显示 `v_id=1`、`v_name=张三`。这是显式复合类型的整段文本输入；当前参数窗格没有逐字段对象编辑表单。匿名 record、任意对象、嵌套复合类型、数组以及 JSON/JSONB 的编辑体验不属于本节验证结论，不能直接套用这两个字段的示例。
 
-![调试启动后的过程源码与暂停位置](imgs/debug-source.png)
+![调试启动后的过程源码与暂停位置](./imgs/debug-source.png)
 
 图 1：左侧 Debug 树显示暂停栈帧；中间 Source 页显示过程源码，箭头及高亮标识当前执行位置。顶部 Database 对应“数据库”菜单。图示为跨 schema 演示过程，调用对象与第 4 节最小示例不同。
 
@@ -354,7 +374,7 @@ GaussDB 507 的 `info_locals` 在整个复合对象为 SQL NULL 时，字段摘�
 
 负向测试：将整数变量输入非法文本，应提示失败，不得伪造为修改成功。常量、非当前可写帧等受保护对象可能拒绝修改，不承诺所有变量都能修改。
 
-![暂停后查看当前栈帧变量](imgs/debug-step-variables.png)
+![暂停后查看当前栈帧变量](./imgs/debug-step-variables.png)
 
 图 2：调试暂停后，左侧显示当前线程和栈帧，中间源码高亮当前执行行，右侧 Variables/变量窗格显示当前栈帧的参数和局部变量。截图已经裁去桌面空白区域，显示完整 DBeaver 窗口。
 
@@ -395,7 +415,7 @@ GaussDB 507 的 `info_locals` 在整个复合对象为 SQL NULL 时，字段摘�
 
 行号以服务端返回的源码和编辑器实际显示为准，不硬套手册代码块的排版行号。主动关闭源码标签后，界面不应因旧的导航请求立即重新打开或抢回焦点；需要查看时可再次双击对应栈帧。
 
-![父子过程调用栈和子过程源码定位](imgs/call-stack.png)
+![父子过程调用栈和子过程源码定位](./imgs/call-stack.png)
 
 图 3：左侧同时显示 ui_child 和 ui_parent 栈帧，双击对应帧切换源码。图中子过程的计算常量为跨 schema 演示值，不应用来判断第 4 节示例的 11/13 结果。
 
@@ -438,7 +458,7 @@ GROUP BY value ORDER BY value;
 
 客户端不能自动识别本次过程执行过哪些历史 `COMMIT`。即使过程最后一行是 `COMMIT`，驱动随后仍可能报告事务为 `OPEN`，因此仍可能出现剩余事务处理窗口；不能用弹窗是否出现判断过程有没有提交。以上 `ui_parent`/`ui_child` 最小例子不含内部 `COMMIT`，其 T10/T11 预期只适用于这份示例。
 
-![调试结束后的提交或回滚选择](imgs/debug-transaction-choice.png)
+![调试结束后的提交或回滚选择](./imgs/debug-transaction-choice.png)
 
 图 4：调试结束时只处理调试连接仍未提交的剩余事务，默认回滚；已被过程或调用对象 COMMIT 的内容无法撤销。选择后必须由独立连接查数。
 
@@ -491,7 +511,7 @@ SET LOCAL search_path = <Package 所在 schema>
 
 批量编译：按住 Ctrl 选择本轮多个测试包，右键“编译包”。如果中途失败/取消，要记录已处理数量；不能把剩余未执行对象记为成功。
 
-![Package 右键菜单中的三种编译动作](imgs/package-compile-menu.png)
+![Package 右键菜单中的三种编译动作](./imgs/package-compile-menu.png)
 
 图 5：右键具体 Package 对象可看到“编译包、编译包声明、编译包主体”；不要在 Packages 文件夹或普通 SQL 编辑器标签上查找这些菜单。
 
@@ -512,11 +532,11 @@ SET LOCAL search_path = <Package 所在 schema>
 
 如果服务端直接拒绝保存无效主体，编辑器中未保存的错误文本不会被冒充为服务器已保存源码。应先保留保存失败的错误原文；只有 `GS_SOURCE` 中确实存在待编译源码时，源码重放才可继续。不能把“近似”位置记作服务端精确定位，也不要为造错误修改系统表或开启未获批准的私有参数。
 
-![包编译错误列表与打开源码按钮](imgs/package-errors.png)
+![包编译错误列表与打开源码按钮](./imgs/package-errors.png)
 
 图 6：Package、Source part、Line、Error 分别对应“包、源码部分、行号、错误”；选中错误后点击右下角 Open source（打开源码），或双击错误行。实际错误内容由服务器返回。
 
-![从编译错误窗口打开并定位包源码](imgs/package-error-location.png)
+![从编译错误窗口打开并定位包源码](./imgs/package-error-location.png)
 
 图 7：打开源码后，编辑器切换到发生错误的声明或主体；精确行号来自服务端结构化诊断，近似位置和 `Line -` 必须按第 14 步说明解释。
 
@@ -538,7 +558,7 @@ END manual_pkg_second;
 
 删除无法靠“撤销文本编辑”恢复，只能依靠保存的 DDL 在测试库重建。不要选中整个 schema 或连接执行删除。
 
-![批量删除 Package 前的对象确认](imgs/package-delete-confirm.png)
+![批量删除 Package 前的对象确认](./imgs/package-delete-confirm.png)
 
 图 8：确认框必须只列出本次选中的测试包；第一次取消验证无副作用，第二次才确认删除。
 
@@ -604,7 +624,7 @@ JDBC 驱动版本：
 
 ## 14. 已验证与待现场验收的边界
 
-Linux GUI 与 GaussDB 507 已有断点重复启停、首次跨 schema 导航、事务回滚和复杂包脚本等专项证据；本版本同时完成 GaussDB 505.2.1.SPC0800 分布式与集中式 JDBC 真库回归。上述结果不能替代客户业务 SQL、桌面云键盘转发、503 系列或 Windows 实机验证。
+Linux GUI 与 GaussDB 507 已有断点重复启停、首次跨 schema 导航、事务回滚和复杂包脚本等专项证据；历史版本还完成过 GaussDB 505.2.1.SPC0800 分布式与集中式 JDBC 真库回归；本次 R3 分区修复的真库验证为 GaussDB 507 集中式 ORA。上述结果不能替代客户业务 SQL、桌面云键盘转发、503 系列或 Windows 实机验证。
 
 本说明书用于指导使用和现场功能检查，不替代客户目标环境的验收报告。原生 gs_dump/gs_restore 不属于原始七项，也不随本包内置；如需使用，应另按平台准备匹配的原生工具。
 

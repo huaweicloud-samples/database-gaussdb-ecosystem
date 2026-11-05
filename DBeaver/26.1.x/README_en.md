@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB Enhanced Edition Guide
 
-Application build: `26.1.5.20261105r1`; delivery revision: `20261105-r2`; updated on 2026-11-05. R2 updates the connection manual to V1.9 and delivers the complete enhanced source. Java plug-ins retain the R1 build; the archives, manual, source and checksums identify this delivery revision.
+Application build: `26.1.5.20261105r3`; delivery revision: `20261105-r3`; updated on 2026-11-05. R3 fixes partition properties, subpartition navigation and refresh, and delivers both Kylin V10 x86_64 and ARM64 clients.
 
 ## 1. Overview
 
@@ -16,16 +16,17 @@ It reuses the official DBeaver object model, SQL editor, Eclipse RCP platform, a
 - `refcursor` / `sys_refcursor` state summaries, read-only attributes, and attribute watches.
 - Commit or rollback selection when a debug session finishes.
 - Package specification, body, and full compilation, compile-error navigation, and batch deletion.
+- Partitioning strategy and keys, physical partitions and subpartitions, boundaries, and refresh.
 
 Source baselines:
 
-- [DBeaver GaussDB enhanced source tag](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r2)
-- Source revision: `e6382732e5fdcba34ecea6099870960b1b3d0b0a`
+- [Complete enhanced source in this ecosystem release](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
+- Java functional revision: `5337454d1e9678c7956c30a8b11ac71412ee5a97`; see [SOURCE-REVISIONS.json](./SOURCE-REVISIONS.json) for the complete delivered-source revision.
 - [Independent test project](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - Test revision: `96690286a163c0f3898fab3d3877098520384f3d`
 
 - [Illustrated GUI operation manual (Chinese)](./GAUSSDB_GUI_OPERATION_MANUAL.md)
-- [Detailed V1.9 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+- [Detailed V1.10 operation manual (Word download)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 - [Source components and revisions](./SOURCE-REVISIONS.json)
 
 ## 2. Scope
@@ -33,8 +34,8 @@ Source baselines:
 | Item | Current release scope |
 | --- | --- |
 | Client version | DBeaver 26.1.5 GaussDB Enhanced Edition |
-| Client platform | Kylin V10 x86_64 |
-| Validated database | Historical baseline: centralized and distributed GaussDB 505.2.1.SPC0800; this composite-parameter and transaction-message repair: centralized GaussDB 507 ORA; see section 8 for the validation scope |
+| Client platform | Kylin V10 x86_64 and ARM64/aarch64, with separate architecture-specific archives |
+| Validated database | This partition and refresh check: centralized GaussDB 507 ORA; historical centralized/distributed 505 records are listed in section 9 |
 | Compatibility modes | Detects ORA/A, MYSQL/B, TD/C, PG, and M; features are enabled according to server capabilities |
 | PL/SQL debugging | Enabled when the server provides the required `DBE_PLDEBUGGER` signatures and the current user has permission |
 | Package management | Full capability is intended for Package-capable centralized ORA deployments; other deployments use capability-based fallback behavior |
@@ -43,40 +44,47 @@ M compatibility mode supports connections, object browsing, and basic SQL operat
 
 ## 3. Download and integrity verification
 
-This ecosystem release provides the Kylin V10 x86_64 client archive, product manifest, complete enhanced source, and a standalone Word manual. `SHA256SUMS` covers these four payload files:
+This ecosystem release provides clients for both architectures, matching product manifests, complete enhanced source, and a standalone Word manual. Run `uname -m` and choose the matching archive:
 
-- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz)
-- [Product manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/SHA256SUMS)
-- [Complete enhanced source, including matching dbeaver-common](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz)
-- [V1.9 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+| `uname -m` | Client download | Product manifest |
+| --- | --- | --- |
+| `x86_64` | [Linux x86_64 client](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r3.tar.gz) | [x86_64 manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r3.PRODUCT-MANIFEST.json) |
+| `aarch64` | [Linux ARM64 client](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.tar.gz) | [ARM64 manifest](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.PRODUCT-MANIFEST.json) |
 
-The default **Source code (zip/tar.gz)** links on the GitHub Release page archive the ecosystem documentation repository. For this enhanced DBeaver source, download the explicitly named `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz` above. It contains complete `dbeaver/` and matching `dbeaver-common/` trees plus a file-hash `SOURCE-MANIFEST.json`.
+- [Release page](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-20261105-r3)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/SHA256SUMS)
+- [Complete enhanced source, including matching dbeaver-common](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
+- [V1.10 connection and debugging manual (Word)](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 
-Client archive SHA-256:
+The standalone Word asset has an ASCII filename for download compatibility and Chinese content. The client archive retains the Chinese filename. Word is updated to V1.10 with R3 download links and illustrated partition instructions. The online steps and screenshots for both architectures are in section 8 of this guide.
 
-```text
-e35365c5c3af67ab8a73e63b7aaf73287b09df60caf82d7526e2ba079730c8c5  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
-```
+For installation, download the appropriate client and use the online or Word guide. Download the complete source archive when building or reviewing the implementation.
 
-Verify the download and architecture:
+The default **Source code (zip/tar.gz)** links on the GitHub Release page archive the ecosystem documentation repository. For the enhanced DBeaver source, use the explicitly named `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz` above. It contains complete `dbeaver/` and matching `dbeaver-common/` trees plus a file-hash `SOURCE-MANIFEST.json`.
+
+Place the selected client and `SHA256SUMS` in the same directory. Each downloaded file must report `OK`; `--ignore-missing` skips other architectures and assets that were not downloaded. Expected digests are provided by this release's `SHA256SUMS`.
 
 ```bash
-sha256sum -c SHA256SUMS
 uname -m
+sha256sum --ignore-missing -c SHA256SUMS
 ```
-
-`uname -m` must report `x86_64`, and the digest must match the value above. This package cannot run on ARM64/aarch64 systems.
-
-The standalone Word asset uses an ASCII filename for download compatibility; its content is Chinese. The client archive retains the Chinese manual filename.
 
 ## 4. Installation and startup
 
 The release is a portable archive with a bundled Java 21 runtime. Extract it into a new directory instead of overwriting an active installation.
 
+On x86_64:
+
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r3.tar.gz
+cd dbeaver
+./dbeaver
+```
+
+On ARM64/aarch64, use the other archive:
+
+```bash
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -120,6 +128,12 @@ The distribution does not bundle a GaussDB JDBC driver. Use an organization-appr
 The client does not silently alter private session parameters. If a server capability requires an additional parameter, the capability check or server error reports it explicitly so that a user or database administrator can review and set it deliberately.
 
 Built-in GaussDB drivers disable “Thread safe driver” by default, serializing statements and result reading on each connection to avoid driver concurrency failures during multi-schema refresh. Separate connections remain parallel. If an old workspace or custom driver explicitly enables this option, disable it in Database → Driver Manager → Edit and reconnect. This is a client setting and does not alter database session parameters.
+
+R3 hides the legacy GaussDB entry in the new-connection picker while retaining existing connection definitions. The M-specific and native configurations remain available. The native entry requires `com.huawei.gaussdb.jdbc.Driver` and `jdbc:gaussdb:`; the JAR filename alone does not establish compatibility. A local native-driver JDBC check against GaussDB 507 M passed connection, temporary-table DDL, bound Unicode/SQL NULL and rollback. This is not acceptance of every driver version or M data type. A legacy gsjdbc4 exposing only `org.postgresql.Driver` needs its matching configuration.
+
+The new-connection picker after hiding the legacy entry:
+
+![Only the M and native presets appear](./imgs/new-connection-two-drivers.png)
 
 ## 6. Debug a stored procedure or function
 
@@ -218,9 +232,53 @@ Multiple Packages can be selected in Database Navigator for batch deletion. The 
 
 If a distributed server does not support forced invalid Package bodies or compilation diagnostic views, the client displays the direct server error and does not report compile-error navigation as successful.
 
-## 8. Validation results
+## 8. Inspect partitions and subpartitions
 
-R2 is a connection-manual and source-delivery revision. Java plug-ins remain the R1 build; the R1 full-regression records below were not rerun for R2. Validation of the new connection walkthrough: A translated Kylin V10 x86_64 container connected to centralized 507 ORA using a fresh connection wizard, the native driver and a local JDBC jar; field entry, authentication without saved password, successful connection test, saved navigation, SQL queries confirming Kernel 507/current database/user/sql_compatibility=A, and the Error Log view were exercised. Thirteen complete-window screenshots were captured. The revised Word manual has 43 pages and 24 images, all visually checked.
+1. In Database Navigator, expand **connection → database → schemas → target schema → Tables** and double-click the partitioned table.
+2. On **Properties**, inspect **Partition key**, for example `RANGE (id)`, `LIST (region)`, `HASH (id)`, or `INTERVAL (event_date)`.
+3. Select **Partitions** in the Properties sidebar to see first-level names and **Partition expression** boundaries. The table's **Partitions** folder in the navigator provides another entry point.
+4. For a two-level table, expand **Partitions → first-level partition → Subpartitions**. Double-click the first-level partition and select **Properties → Subpartitions** to view child names and boundaries. Its own boundary and its children's partitioning key are displayed separately.
+5. After a database-side partition change, select the parent table or partition and press **F5**. Check both the tree and the open list. A leaf without children does not expose an empty Subpartitions folder.
+
+In these screenshots, `orders_nested` uses RANGE partitioning on `id`. Its `p_low` partition has boundary `VALUES LESS THAN (100)` and uses LIST subpartitioning on `region`; the child boundaries are `VALUES ('CN')` and `VALUES (DEFAULT)`. An unbounded RANGE partition displays `MAXVALUE`. Inspecting this metadata does not modify partition definitions.
+
+Maximize the window and, when needed, close the right-hand Chat tab to make room for the name, partition key, and partition expression columns.
+
+Actual client in the Kylin V10 x86_64 container:
+
+![x86_64: expanded partitions, subpartitions, and boundaries](./imgs/partition-x86_64-expanded.png)
+
+The same operation in the Kylin V10 ARM64 container:
+
+![ARM64: expanded partitions, subpartitions, and boundaries](./imgs/partition-aarch64-expanded.png)
+
+## 9. Validation results
+
+### 9.1 R3 validation
+
+- Restore partition properties in the table editor and display actual, correctly quoted column names. Read a partition's own boundary separately from its subpartition strategy; automatic INTERVAL partitions use range-boundary notation.
+- Restore the subpartition tree and editor entry that was lost when the PostgreSQL navigator tree was inherited. The explicit physical-subpartition node is registered for GaussDB; PostgreSQL's original navigator remains unchanged.
+- Refresh physical partitions from `pg_partition`, replace stale objects and update the parent cache, instead of treating partition OIDs as `pg_class` table OIDs.
+- Main OSGi JUnit regression: **3,159 cases; 2,975 passed, 184 conditionally skipped, zero failures or errors**. Fifteen partition-property, registered-tree, two-level metadata and refresh cases were added. The complete suite ran on the build host; it was not rerun in full on ARM.
+- All 43 packaging-script checks passed and all 204 product modules built successfully. Both archives were freshly extracted and passed their 1,202-entry application manifests.
+- Both real GUIs ran in Kylin Linux Advanced Server V10 (Lance) containers against the same centralized GaussDB 507 ORA database. The x86_64 user space used host instruction translation; ARM64 used native ARM64 user space. Both containers share the host LinuxKit kernel.
+
+| Client check in this round | x86_64 | ARM64 |
+| --- | --- | --- |
+| Startup and database connection | Passed | Passed |
+| Seven-table matrix: RANGE, LIST, HASH, INTERVAL, quoted column name, ordinary table, two-level partition table | Passed | Passed |
+| First-level expansion, Subpartitions entry, editor list and boundaries | Passed | Passed |
+| Leaf hides an empty next-level entry | Passed | Passed |
+| Same connection with cached children: add a subpartition, F5 changes tree and list from 2 to 3 | Passed | Passed |
+| Drop that subpartition, F5 returns tree and list from 3 to 2 | Passed | Passed |
+
+The seven tables' actual metadata, property descriptors and boundaries match line for line. All 451 identically named shared JARs in the two products match byte for byte. ARM coverage in this round is the GUI and metadata smoke comparison above; it does not establish full ARM acceptance of all historical debugging, Package, or customer virtual-desktop scenarios.
+
+### 9.2 Historical validation records
+
+The following results retain their original build dates. Newly executed R3 checks are listed above; complete historical GUI suites, 505-server checks and other environments were not rerun in this round.
+
+Historical 2026-11-05 R2 was a connection-manual and source-delivery revision. Java plug-ins remain the R1 build; the R1 full-regression records below were not rerun for R2. Validation of the new connection walkthrough: A translated Kylin V10 x86_64 container connected to centralized 507 ORA using a fresh connection wizard, the native driver and a local JDBC jar; field entry, authentication without saved password, successful connection test, saved navigation, SQL queries confirming Kernel 507/current database/user/sql_compatibility=A, and the Error Log view were exercised. Thirteen complete-window screenshots were captured. The revised Word manual has 43 pages and 24 images, all visually checked.
 
 Validation of the 2026-11-05 R1 build:
 
@@ -263,18 +321,18 @@ The R5, R4, R3, and R2 entries below are historical records; their complete suit
 
 The 2026-10-14 baseline previously passed centralized and distributed 505 live-database and independent acceptance checks. That full historical suite was not rerun for this repair build. Persistent loading in a target environment still needs an upgrade retest to establish whether its cause matches the repaired driver concurrency exception.
 
-## 9. Current boundaries
+## 10. Current boundaries
 
-- This ecosystem release contains only the Kylin V10 x86_64 package; ARM64 and Windows packages are not included.
-- Current object-parameter GUI coverage is limited to the composite examples above. It does not establish GUI acceptance for every user-defined object, array, or domain type. The translated Kylin container shares the LinuxKit kernel; these results do not replace native x86 hardware or customer virtual-desktop acceptance.
+- This release provides Kylin V10 x86_64 and ARM64/aarch64 packages. Windows and macOS packages were not built and accepted in this round.
+- Historical object-parameter GUI coverage is limited to the composite examples above; it does not establish acceptance for every object, array or domain type. ARM coverage in this round is limited to section 9.1. Neither container comparison replaces acceptance on customer hardware, a native Kylin kernel or a virtual desktop.
 - Locally rebuilt Linux native libraries in the package are not digitally signed. Verify integrity with the published SHA-256 digest and product manifest.
 - GaussDB JDBC, `gs_dump`, `gs_restore`, and other native database tools are not distributed with the client.
 - PL/SQL debugging depends on server debug APIs, compatibility mode, routine language, and user permissions.
 - Package error navigation depends on Package and compilation-diagnostic capabilities in the target server version.
-- Paused local cursors expose server-supplied state only. Result rows, original SQL, and column-structure previews require a future server interface. The older name-based hidden format is covered by protocol-fixture unit tests; the current live-server coverage uses the 507 inline format.
+- Paused local cursors expose server-supplied state only. Result rows, original SQL, and column-structure previews require a future server interface. The older name-based hidden format is covered by protocol-fixture unit tests; the historical live-server cursor coverage uses the 507 inline format.
 - Before first use in a target environment, verify the digest and run organization-specific connection, debugging, transaction, and Package acceptance tests.
 
-## 10. Build from the delivered source
+## 11. Build from the delivered source
 
 The complete source archive contains sibling `dbeaver/` and `dbeaver-common/` directories. The latter is pinned to official commit `2df03e58480c6325732f476e8355e375cec5405e`; do not replace it with a moving branch. See the [component record](./SOURCE-REVISIONS.json) and the archive's `SOURCE-MANIFEST.json` for revisions and origins.
 
@@ -287,14 +345,14 @@ java -version
 mvn -v
 mvn -f product/aggregate/pom.xml -Pproduct-dbeaver-ce package \
   -DskipTests=true -Dskip-checkstyle=true -Dspotless.check.skip=true \
-  -DforceContextQualifier=20261105r1 \
-  -Dbuild-timestamp=20261105r1
+  -DforceContextQualifier=20261105r3 \
+  -Dbuild-timestamp=20261105r3
 ```
 
-The application qualifier remains `20261105r1`; `20261105-r2` identifies the manual/source delivery revision. `-DskipTests=true` packages the product without executing tests. Maven/P2 dependencies must be reachable or available in a complete, matching offline cache; downloading the source alone does not guarantee an automatic offline build.
+The application qualifier is `20261105r3`, and the delivery revision is `20261105-r3`. `-DskipTests=true` packages the product without executing tests. Maven/P2 dependencies must be reachable or available in a complete, matching offline cache; downloading the source alone does not guarantee an automatic offline build.
 
-The command builds the Java/Eclipse product. Recreating the Kylin archive additionally requires matching native libraries, pinned SWT/Equinox sources, JRE, Node.js 22+, and assembly tools. See `product/community/kylin/README.zh-CN.md` and `THIRD-PARTY-SOURCES.md` in the source. Auditable source and platform build validation do not imply byte-identical rebuilds. Upstream and historical Markdown files remain source material; use the linked V1.9 manual for customer operations.
+The command builds the Java/Eclipse product. Recreating the Kylin archive additionally requires matching native libraries, pinned SWT/Equinox sources, JRE, Node.js 22+, and assembly tools. See `product/community/kylin/README.zh-CN.md` and `THIRD-PARTY-SOURCES.md` in the source. Auditable source and platform build validation do not imply byte-identical rebuilds. Upstream and historical Markdown files remain source material; use the linked V1.10 manual for customer operations.
 
-## 11. Licensing
+## 12. Licensing
 
 DBeaver Community source and these enhancements are provided under the applicable Apache License 2.0 terms. Bundled third-party components remain under their respective licenses; third-party source and license information is included in the package.
