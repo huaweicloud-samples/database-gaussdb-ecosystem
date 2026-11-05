@@ -1,6 +1,6 @@
 # DBeaver 26.1.5 GaussDB 增强版使用指南
 
-应用构建：`26.1.5.20261105r1`；交付修订：`20261105-r2`；更新日期：2026-11-05。R2 更新连接操作手册 V1.9 和完整源码交付，应用 Java 插件沿用 R1 构建；归档、手册、源码及校验文件对应本次交付修订。
+应用构建：`26.1.5.20261105r3`；交付修订：`20261105-r3`；更新日期：2026-11-05。R3 修复分区属性、二级分区导航及刷新，并交付麒麟 V10 x86_64 和 ARM64 两种客户端。
 
 ## 1. 概述
 
@@ -16,16 +16,17 @@
 - `refcursor` / `sys_refcursor` 游标状态摘要、只读属性展开及属性监视。
 - 调试结束后的提交或回滚选择。
 - Package 规格、包体及整体编译，编译错误定位和批量删除。
+- 分区表的分区方式、分区键、一级及二级分区列表、边界与刷新。
 
 源码基线：
 
-- [DBeaver GaussDB 增强版源码标签](https://github.com/jarrenL/dbeaver/tree/gaussdb-2615-x86_64-beta-20261105-r2)
-- 源码修订：`e6382732e5fdcba34ecea6099870960b1b3d0b0a`
+- [本次完整增强源码（生态仓 Release 附件）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
+- 本轮 Java 功能修订：`83c09896ee825b0b10c2462ef10001733128d087`；完整交付源码修订见 [SOURCE-REVISIONS.json](./SOURCE-REVISIONS.json)。
 - [独立测试工程](https://github.com/jarrenL/gaussdb-dbeaver-tests)
 - 测试修订：`96690286a163c0f3898fab3d3877098520384f3d`
 
 - [图形界面操作手册（在线阅读，含截图）](./GAUSSDB_GUI_OPERATION_MANUAL.md)
-- [详细操作手册 V1.9（Word，直接下载）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+- [详细操作手册 V1.10（Word，直接下载）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 - [源码组件与修订记录](./SOURCE-REVISIONS.json)
 
 ## 2. 适用范围
@@ -33,8 +34,8 @@
 | 项目 | 当前发布范围 |
 | --- | --- |
 | 客户端版本 | DBeaver 26.1.5 GaussDB 增强版 |
-| 客户端系统 | 麒麟 V10 x86_64 |
-| 已验数据库 | 历史基线：GaussDB 505.2.1.SPC0800 集中式与分布式；本次复合对象参数及事务提示修复：GaussDB 507 集中式 ORA，具体结果见第 8 节 |
+| 客户端系统 | 麒麟 V10 x86_64、ARM64/aarch64；分别提供对应架构的归档 |
+| 已验数据库 | 本轮分区展示与刷新：GaussDB 507 集中式 ORA；505 集中式、分布式等既有验证记录见第 9 节 |
 | 数据库兼容模式 | 支持识别 ORA/A、MYSQL/B、TD/C、PG、M；具体功能按服务端能力开放 |
 | PL/SQL 调试 | 服务端具备 `DBE_PLDEBUGGER` 接口且用户有相应权限时开放 |
 | Package | 以支持 Package 的集中式 ORA 环境为完整能力范围；其他部署形态按服务端能力降级 |
@@ -43,42 +44,47 @@ M 兼容模式支持连接、对象浏览和基础 SQL 操作，但不声明支�
 
 ## 3. 下载与完整性校验
 
-本次生态仓 Release 提供麒麟 V10 x86_64 客户端归档、产品文件清单、完整增强源码和独立 Word 手册；`SHA256SUMS` 覆盖这四个交付文件：
+本次生态仓 Release 提供两种架构的客户端、对应产品文件清单、完整增强源码和独立 Word 手册。先执行 `uname -m`，选择匹配的客户端：
 
-- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2)
-- [dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz)
-- [产品文件清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.PRODUCT-MANIFEST.json)
-- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/SHA256SUMS)
-- [完整增强源码（含匹配的 dbeaver-common）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz)
-- [连接与调试操作手册 V1.9（Word）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-x86_64-20261105-r2/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
+| `uname -m` | 客户端下载 | 产品文件清单 |
+| --- | --- | --- |
+| `x86_64` | [Linux x86_64 客户端](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r3.tar.gz) | [x86_64 清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r3.PRODUCT-MANIFEST.json) |
+| `aarch64` | [Linux ARM64 客户端](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.tar.gz) | [ARM64 清单](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.PRODUCT-MANIFEST.json) |
 
-独立 Word 附件采用英文文件名以兼容下载平台，正文仍为中文；安装包内保留中文手册文件名。
+- [Release 页面](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/tag/dbeaver-gaussdb-26.1.5-kylin-20261105-r3)
+- [SHA256SUMS](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/SHA256SUMS)
+- [完整增强源码（含匹配的 dbeaver-common）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz)
+- [连接与调试操作手册 V1.10（Word）](https://github.com/huaweicloud-samples/database-gaussdb-ecosystem/releases/download/dbeaver-gaussdb-26.1.5-kylin-20261105-r3/GaussDB_DBeaver_Debug_and_Package_Manual_20261105.docx)
 
-普通安装使用客户端下载和 Word 手册即可；需要自行编译或审阅实现时再下载完整增强源码。
+独立 Word 附件采用英文文件名以兼容下载平台，正文仍为中文；安装包内保留中文手册文件名。Word 本轮更新至 V1.10，修正 R3 下载地址并补充分区操作图示；在线步骤及两种架构截图见本指南第 8 节。
 
-GitHub Release 页面自动提供的 **Source code (zip/tar.gz)** 是生态仓本身的文档树快照。要获取本增强版 DBeaver 源码，请下载上述显式命名的 `dbeaver-gaussdb-enhanced-source-20261105-r2.tar.gz`；其中包含完整 `dbeaver/`、精确匹配的 `dbeaver-common/` 和逐文件哈希记录 `SOURCE-MANIFEST.json`。
+普通安装只需对应架构的客户端；操作时可参照在线指南或 Word 手册。需要自行编译或审阅实现时，再下载完整增强源码。
 
-客户端归档 SHA-256：
+GitHub Release 页面自动提供的 **Source code (zip/tar.gz)** 是生态仓本身的文档树快照。要获取本增强版 DBeaver 源码，请下载上述显式命名的 `dbeaver-gaussdb-enhanced-source-20261105-r3.tar.gz`；其中包含完整 `dbeaver/`、精确匹配的 `dbeaver-common/` 和逐文件哈希记录 `SOURCE-MANIFEST.json`。
 
-```text
-e35365c5c3af67ab8a73e63b7aaf73287b09df60caf82d7526e2ba079730c8c5  dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
-```
-
-下载后执行：
+将所选客户端和 `SHA256SUMS` 放在同一目录，执行以下命令核对已下载文件。每个已下载文件都应显示 `OK`；未下载的其他架构及附件通过 `--ignore-missing` 跳过。发布文件的预期摘要以本次 Release 的 `SHA256SUMS` 为准。
 
 ```bash
-sha256sum -c SHA256SUMS
 uname -m
+sha256sum --ignore-missing -c SHA256SUMS
 ```
-
-`uname -m` 应返回 `x86_64`，并且摘要必须与上方一致。ARM64/aarch64 机器不能运行该包。
 
 ## 4. 安装与启动
 
 本发布包为免安装归档，内置 Java 21 运行环境。建议解压到新目录，不要覆盖正在使用的旧目录。
 
+x86_64 机器：
+
 ```bash
-tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r2.tar.gz
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-x86_64-20261105-r3.tar.gz
+cd dbeaver
+./dbeaver
+```
+
+ARM64/aarch64 机器使用另一份归档：
+
+```bash
+tar -xzf dbeaver-ce-26.1.5-gaussdb-linux-aarch64-20261105-r3.tar.gz
 cd dbeaver
 ./dbeaver
 ```
@@ -105,23 +111,41 @@ chmod +x dbeaver
 先按以下顺序完成连接，再进入存储过程或 Package 调试。详细全窗口截图与逐步标注见[在线操作手册](./GAUSSDB_GUI_OPERATION_MANUAL.md)，也可下载上面的 Word 手册离线查看。
 
 1. 确认数据库管理员提供的主机、端口、数据库名、账号及兼容模式；数据库地址填写服务器可访问地址，而不是本机解压目录。
-2. 通过“数据库 → 新建数据库连接”或工具栏“新建连接”进入向导，选择 GaussDB 驱动；按以下步骤添加与目标库版本匹配的 JDBC JAR。
-3. 填写连接参数，执行“测试连接”。成功后完成向导，在左侧“数据库导航器”确认连接可展开。
+2. 通过“数据库 → 新建数据库连接”或工具栏“新建连接”进入向导，选择唯一的 **GaussDB** 入口；O/A/ORA 与 M 库都使用此入口。按以下步骤添加与目标库版本匹配的 JDBC JAR。
+3. 填写连接参数；M 库勾选 **M 兼容库：mCompatible=true、yearIsDateType=true**，A/O 库不勾。此项只设置本连接的 JDBC 参数，不修改数据库兼容模式。 URL 模式请勿在查询串中重复填写 `mCompatible` 或 `yearIsDateType`；页面会提示移除冲突项，以保证勾选设置与实际生效值一致。执行“测试连接”，成功后完成向导，确认左侧“数据库导航器”可展开。
 4. 展开目标数据库与 Schema，确认可以看到表及受支持的存储过程／函数／包；再按第 6、7 节配置调试和编译。
 
 
 发布包不内置 GaussDB JDBC 驱动。请使用与目标数据库版本匹配、经过组织审批的驱动：
 
 1. 启动 DBeaver，选择“数据库”→“驱动管理器”。
-2. O/Oracle 模式选择 **GaussDB 原生驱动（GaussDB Native）**，点击“编辑”；也可在新建连接向导里点击“编辑驱动设置”。
+2. 选择 **GaussDB**，点击“编辑”；也可在新建连接向导里点击“编辑驱动设置”。
 3. 在“库”页添加 GaussDB JDBC JAR。
-4. 确认原生驱动类为 `com.huawei.gaussdb.jdbc.Driver`，URL 协议为 `jdbc:gaussdb:`；不要混入 PostgreSQL jar 或多个冲突版本。
+4. 默认常用 `gsjdbc4.jar` 对应 `org.postgresql.Driver` 与 `jdbc:postgresql:`；若官方 JAR 实际使用 `com.huawei.gaussdb.jdbc.Driver`，在驱动编辑页配套设置 `jdbc:gaussdb:`。按 JAR 的实际类名与协议配套，不凭文件名判断，也不因 O 模式强制换包；不要混入多个冲突版本。
 5. 保存后新建连接，填写主机、端口、数据库、用户名和密码。
 6. 点击“测试连接”，成功后完成向导。再在 SQL 编辑器查询 `version()`、`current_database()`、`current_user` 和 `pg_settings.sql_compatibility`，确认真实目标；测试成功框不代替这些查询。
+
+R3 新建连接列表统一为一个 **GaussDB** 入口；旧三个驱动定义仍在内部保留，已保存连接按原定义加载，驱动管理器仍可调整配置。本轮统一入口使用匹配的 `gsjdbc4.jar`，在两种架构上完成 GaussDB 507 A/M 真实连接、模式识别、M 参数保存与重新打开；另完成临时表、中文及 SQL NULL 绑定和回滚的 JDBC 验证。此结果不代表全部驱动版本或 M 数据类型均已验收。
 
 客户端不会在后台静默修改会话级私有参数。若特定服务端能力要求额外参数，能力检查或错误信息会明确提示，由用户或数据库管理员确认后显式设置。
 
 GaussDB 内置驱动默认取消“Thread safe driver”，使同一连接上的语句和结果读取互斥，避免多 Schema 并发刷新触发驱动内部异常；不同连接仍可并行。旧工作区或自定义驱动若显式启用了此选项，请在“数据库 → 驱动管理器 → 编辑驱动”中取消后重新连接。这是客户端选项，不修改数据库会话参数。
+
+新版新建连接列表（统一 GaussDB 入口，旧连接定义保留）：
+
+![新建连接只显示一个 GaussDB 入口](./imgs/new-connection-gaussdb.png)
+
+在连接向导的“主要”页选择 M 兼容选项；A/O 库不勾选：
+
+![连接页显式 M 兼容 JDBC 选项](./imgs/connection-m-options.png)
+
+点击右下角“编辑驱动设置”查看或修改驱动类；主机模式下 JDBC 协议由实际驱动类生成，返回连接页核对实际 URL：
+
+![驱动类与 URL 模板](./imgs/connection-driver-class.png)
+
+当前连接的 JDBC 参数位于“驱动属性”页，图中 `mCompatible=true` 对应已勾选的 M 选项：
+
+![当前连接的 JDBC 驱动属性](./imgs/connection-driver-properties.png)
 
 ## 6. 调试存储过程或函数
 
@@ -220,9 +244,55 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 
 分布式版本若不支持强制创建无效包体或编译错误系统视图，客户端会显示服务端直接返回的编译错误，不会把该路径报告为“错误定位成功”。
 
-## 8. 验证结果
+## 8. 查看分区表和子分区
 
-2026-11-05 R2 是连接操作手册和源码交付修订。Java 插件仍为 R1 构建，不将下面的 R1 全量回归记录表述为 R2 已重新执行。新增连接操作图的验证情况：麒麟 V10 x86_64 转译容器连接 507 集中式 ORA，从全新连接向导选择原生驱动、添加本地 JDBC、填写连接字段、不保存密码时完成认证、测试成功、保存连接、展开目标 schema 和表、打开 SQL 编辑器，真实查询确认 Kernel 507、当前库/用户及 sql_compatibility=A，并打开错误日志视图；形成 13 张全窗口截图。新版 Word 为 43 页、24 图，已全页检查。
+1. 在数据库导航器展开 **连接 → 数据库 → 模式 → 目标 Schema → 表**，双击目标分区表。
+2. 在 **属性** 页查看 **分区依据**，例如 `RANGE (id)`、`LIST (region)`、`HASH (id)` 或 `INTERVAL (event_date)`。
+3. 在属性页左侧选择 **分区**，右侧列表显示一级分区名称及 **分区表达式**。也可以在导航树展开该表下的 **分区** 文件夹。
+4. 对二级分区表，继续展开 **分区 → 一级分区 → 子分区**。双击一级分区，在 **属性 → 子分区** 中查看二级分区列表及边界；一级分区自身的边界和下一级的分区依据会分别显示。
+5. 在数据库中增删分区后，选中对应的父表或父分区，按 **F5** 刷新，再检查导航树和已打开的列表。叶子分区没有下一级时，不显示空的“子分区”入口。
+
+例如，下图中 `orders_nested` 按 `id` 做 RANGE 分区，一级分区 `p_low` 的边界是 `VALUES LESS THAN (100)`；其下按 `region` 做 LIST 子分区，列表中显示 `VALUES ('CN')` 和 `VALUES (DEFAULT)`。RANGE 的无上界分区显示 `MAXVALUE`。这些是读取到的元数据，查看时不会修改分区定义。
+
+窗口较窄时先最大化，必要时关闭右侧 Chat 页签，以便同时看到名称、分区依据和分区表达式列。
+
+麒麟 V10 x86_64 容器中的实际客户端界面：
+
+![x86_64：展开一级分区、子分区，并查看边界](./imgs/partition-x86_64-expanded.png)
+
+麒麟 V10 ARM64 容器中的相同操作：
+
+![ARM64：展开一级分区、子分区，并查看边界](./imgs/partition-aarch64-expanded.png)
+
+## 9. 验证结果
+
+### 9.1 本轮 R3 验证
+
+- 修复表结构页丢失分区属性的问题，展示真实列名组成的分区依据；一级边界与二级分区策略分别读取，INTERVAL 自动分区使用范围边界形式显示。
+- 修复继承导航树后丢失二级分区入口的问题；只为 GaussDB 显式注册物理子分区节点，保留 PostgreSQL 原有导航配置。
+- 修复刷新后保留旧子分区缓存的问题；刷新从 `pg_partition` 读取新对象并更新父节点缓存，不再把分区 OID 当作 `pg_class` 表 OID 查询。
+- 主工程 OSGi JUnit 回归共 **3197 项：3013 通过、184 按条件跳过、0 失败、0 错误**；新增 15 项分区、7 项驱动入口及旧连接兼容、37 项连接参数校验，以及 1 项统一入口执行上下文回归。该完整回归运行于构建机，未宣称全部在 ARM 上重跑。
+- 43 项打包脚本检查通过，204 个产品构建模块成功；两个架构的归档分别完成重新解压和 1202 项应用文件清单核对。
+- 两种架构均在麒麟 Linux Advanced Server V10（Lance）容器中运行真实图形客户端，连接同一 GaussDB 507 集中式 ORA 库。x86_64 用户态通过宿主机指令转译运行，ARM64 使用原生 ARM64 用户态；两者共享宿主机 LinuxKit 内核。
+
+| 本轮客户端检查 | x86_64 | ARM64 |
+| --- | --- | --- |
+| 启动、数据库连接 | 通过 | 通过 |
+| 新建连接仅一个 GaussDB，A/M 实库连接及 M 功能门控 | 通过 | 通过 |
+| M 复选项保存及重开、URL 参数冲突提示、驱动类和 JDBC 属性页 | 通过 | 通过 |
+| RANGE、LIST、HASH、INTERVAL、带引号列名、普通表及二级分区表，共七表矩阵 | 通过 | 通过 |
+| 一级分区展开、子分区入口、属性页子分区列表与边界 | 通过 | 通过 |
+| 叶子节点隐藏空的下一级入口 | 通过 | 通过 |
+| 同一连接保持缓存，新增子分区后 F5，树和列表从 2 项变为 3 项 | 通过 | 通过 |
+| 删除该子分区后 F5，树和列表从 3 项恢复为 2 项 | 通过 | 通过 |
+
+七表的实际元数据、属性描述符和边界结果逐行一致；两份产品中 451 个同名共享 JAR 字节一致。本轮 ARM 验证范围是上述图形界面与元数据冒烟对照，不等于全部历史调试、Package 用例或客户桌面云场景已在 ARM 完成验收。
+
+### 9.2 既有验证记录
+
+以下按原构建日期保留既有结果。本轮 R3 新执行的检查见上节；历史 GUI、505 服务端及其他环境的全部场景没有随本轮重新执行。
+
+历史 2026-11-05 R2 是连接操作手册和源码交付修订。Java 插件仍为 R1 构建，不将下面的 R1 全量回归记录表述为 R2 已重新执行。新增连接操作图的验证情况：麒麟 V10 x86_64 转译容器连接 507 集中式 ORA，从全新连接向导选择原生驱动、添加本地 JDBC、填写连接字段、不保存密码时完成认证、测试成功、保存连接、展开目标 schema 和表、打开 SQL 编辑器，真实查询确认 Kernel 507、当前库/用户及 sql_compatibility=A，并打开错误日志视图；形成 13 张全窗口截图。新版 Word 为 43 页、24 图，已全页检查。
 
 2026-11-05 R1 构建的验证结果：
 
@@ -265,18 +335,18 @@ Package 内的成员不属于 Schema 下的独立“存储过程／函数”列�
 
 此前 2026-10-14 基线完成过 505 集中式、分布式真库及独立验收；本次没有重新运行该历史验收的全部场景。目标环境持续加载是否与已修复的驱动并发异常为同一原因，仍需升级后现场复测。
 
-## 9. 当前边界
+## 10. 当前边界
 
-- 本 Release 只提供麒麟 V10 x86_64 包，不包含 ARM64 和 Windows 包。
-- 本次对象参数 GUI 验证限于上述复合类型样例，不声明所有用户定义对象、数组或 domain 类型均已通过图形验收。麒麟容器共享 LinuxKit 内核并通过指令转译运行，结果不替代原生 x86 实机或客户桌面云验收。
+- 本 Release 提供麒麟 V10 x86_64 和 ARM64/aarch64 包，不提供本轮未构建及验收的 Windows、macOS 包。
+- 既有对象参数 GUI 验证限于上述复合类型样例，不声明所有用户定义对象、数组或 domain 类型均已图形验收。本轮 ARM 仅完成第 9.1 节列出的分区冒烟对照；两种容器结果均不替代客户物理机、原生麒麟内核或桌面云准入验收。
 - 包内本地重建的 Linux 原生库未进行数字签名，请以本页公布的 SHA-256 和产品文件清单校验完整性。
 - GaussDB JDBC 驱动、`gs_dump`、`gs_restore` 等数据库原生工具不随客户端分发。
 - PL/SQL 调试依赖服务端调试接口、兼容模式、例程语言和用户权限。
 - Package 错误定位依赖目标版本提供相应的 Package 和编译诊断能力。
-- 暂停调试中的局部游标仅支持服务端返回的状态；结果行、原 SQL 和列结构预览仍依赖后续内核接口。旧式按名称隐藏属性仅完成协议样例单测，本次真库覆盖的是 507 内联状态格式。
+- 暂停调试中的局部游标仅支持服务端返回的状态；结果行、原 SQL 和列结构预览仍依赖后续内核接口。旧式按名称隐藏属性仅完成协议样例单测，既有真库游标验证覆盖的是 507 内联状态格式。
 - 首次用于目标环境时，应按照组织的软件准入流程核对摘要，并完成连接、调试、事务和 Package 场景验收。
 
-## 10. 从交付源码构建
+## 11. 从交付源码构建
 
 完整源码归档包含相邻的 `dbeaver/` 与 `dbeaver-common/`。`dbeaver-common` 固定为官方提交 `2df03e58480c6325732f476e8355e375cec5405e`，不要替换为以后变化的最新分支；源码修订和上游地址见[组件记录](./SOURCE-REVISIONS.json)与归档内 `SOURCE-MANIFEST.json`。
 
@@ -289,14 +359,14 @@ java -version
 mvn -v
 mvn -f product/aggregate/pom.xml -Pproduct-dbeaver-ce package \
   -DskipTests=true -Dskip-checkstyle=true -Dspotless.check.skip=true \
-  -DforceContextQualifier=20261105r1 \
-  -Dbuild-timestamp=20261105r1
+  -DforceContextQualifier=20261105r3 \
+  -Dbuild-timestamp=20261105r3
 ```
 
-这里保留应用构建限定符 `20261105r1`；`20261105-r2` 是手册与源码的交付修订。`-DskipTests=true` 仅用于打包，不表示执行了测试。构建需要 Maven/P2 依赖可访问，或事先准备齐全并匹配的离线依赖缓存；只下载源码不能保证完全离线自动构建。
+本次应用构建限定符为 `20261105r3`，交付修订为 `20261105-r3`。`-DskipTests=true` 仅用于打包，不表示执行了测试。构建需要 Maven/P2 依赖可访问，或事先准备齐全并匹配的离线依赖缓存；只下载源码不能保证完全离线自动构建。
 
-该命令生成 Java/Eclipse 产品。复现本次麒麟归档还需要匹配架构的原生库、固定版本的 SWT／Equinox 源码、JRE、Node.js 22+ 及组装工具，具体见源码内 `product/community/kylin/README.zh-CN.md` 和 `THIRD-PARTY-SOURCES.md`。源码可复核与目标平台构建验证不等于重新构建文件必然逐字节相同。上游或历史 Markdown 文件属于源码资料，客户日常操作以本页链接的 V1.9 操作手册为准。
+该命令生成 Java/Eclipse 产品。复现本次麒麟归档还需要匹配架构的原生库、固定版本的 SWT／Equinox 源码、JRE、Node.js 22+ 及组装工具，具体见源码内 `product/community/kylin/README.zh-CN.md` 和 `THIRD-PARTY-SOURCES.md`。源码可复核与目标平台构建验证不等于重新构建文件必然逐字节相同。上游或历史 Markdown 文件属于源码资料，客户日常操作以本页链接的 V1.10 操作手册为准。
 
-## 11. 许可证
+## 12. 许可证
 
-DBeaver Community 源码及本增强版本遵循其适用的 Apache License 2.0。第三方组件继续遵循各自许可证；包内提供第三方源码与许可证说明。
+DBeaver Community 源码及本增强版本遵循其适用的 Apache License 2.0。第三方组件继续遵循各自许可证；包内保留许可证和第三方源码获取说明。
